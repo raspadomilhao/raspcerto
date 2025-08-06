@@ -1442,7 +1442,7 @@ export default function AdminConfigPage() {
           <Tabs defaultValue="overview" className="space-y-4 md:space-y-8">
             {/* Tabs responsivas */}
             <div className="relative">
-              <TabsList className="grid w-full grid-cols-3 md:grid-cols-9 bg-slate-800/50 border-slate-700 p-1 rounded-xl text-xs md:text-sm overflow-x-auto">
+              <TabsList className="grid w-full grid-cols-3 md:grid-cols-9 bg-slate-800/50 border-slate-700 p-1 rounded-xl text-xs md:text-sm overflow-x-auto touch-pan-x">
                 <TabsTrigger
                   value="overview"
                   className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400 hover:text-white transition-all duration-300 px-2 py-2"
@@ -2526,7 +2526,10 @@ export default function AdminConfigPage() {
                         ) : filteredAgents.length > 0 ? (
                           <div className="space-y-4 md:space-y-6">
                             {filteredAgents.map((agent) => (
-                              <div key={agent.id} className="p-4 md:p-6 bg-slate-800/30 rounded-xl border border-slate-700/50">
+                              <div
+                                key={agent.id}
+                                className="p-4 md:p-6 bg-slate-800/30 rounded-xl border border-slate-700/50"
+                              >
                                 <div className="flex flex-col gap-4">
                                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                                     <div className="flex-1">
@@ -3114,7 +3117,11 @@ export default function AdminConfigPage() {
                                       </Button>
                                       <Button
                                         onClick={() =>
-                                          processWithdrawal(withdrawal.id, "cancelled", "Cancelado pelo administrador")
+                                          processWithdrawal(
+                                            withdrawal.id,
+                                            "cancelled",
+                                            "Cancelado pelo administrador",
+                                          )
                                         }
                                         className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
                                         size="sm"
@@ -3389,7 +3396,7 @@ export default function AdminConfigPage() {
                   <Alert className="border-red-500/50 bg-red-500/10">
                     <AlertTriangle className="h-4 w-4 text-red-400" />
                     <AlertDescription className="text-red-400 text-sm">
-                      Esta ação é IRREVERSÍVEL. Todos os dados financeiros e de jogos serão perdidos permanentemente. Os
+                      Esta ação é irreversível! Todos os dados financeiros e de jogos serão perdidos permanentemente. Os
                       usuários serão mantidos, mas com saldo zerado.
                     </AlertDescription>
                   </Alert>
@@ -3610,7 +3617,7 @@ export default function AdminConfigPage() {
               <CardContent className="space-y-6">
                 <div className="space-y-3">
                   <p className="text-white text-sm md:text-base">
-                    Afiliado: <strong className="text-amber-400">{selectedAffiliate.user_name}</strong>
+                    Afiliado: <strong className="text-emerald-400">{selectedAffiliate.user_name}</strong>
                   </p>
                   <p className="text-xs md:text-sm text-slate-400">
                     Taxa atual: <span className="text-white font-medium">{selectedAffiliate.commission_rate}%</span>
@@ -3629,8 +3636,8 @@ export default function AdminConfigPage() {
                     step="0.1"
                     value={newCommissionRate}
                     onChange={(e) => setNewCommissionRate(e.target.value)}
-                    placeholder="Ex: 15.5"
-                    className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-amber-500 focus:ring-amber-500/20 h-12"
+                    placeholder="Ex: 5.0"
+                    className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:ring-emerald-500/20 h-12"
                   />
                 </div>
 
@@ -3638,7 +3645,7 @@ export default function AdminConfigPage() {
                   <Button
                     onClick={updateCommissionRate}
                     disabled={updateLoading || !newCommissionRate}
-                    className="flex-1 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white h-12"
+                    className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white h-12"
                   >
                     {updateLoading ? (
                       <>
@@ -3670,57 +3677,53 @@ export default function AdminConfigPage() {
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <Card className="w-full max-w-md border-slate-800/50 bg-slate-900/90 backdrop-blur-xl">
               <CardHeader>
-                <CardTitle className="text-white text-lg md:text-xl flex items-center space-x-3">
-                  <KeyRound className="h-5 w-5 md:h-6 md:w-6 text-blue-400" />
-                  <span>Alterar Senha do Afiliado</span>
-                </CardTitle>
+                <CardTitle className="text-white text-lg md:text-xl">Alterar Senha do Afiliado</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-3">
                   <p className="text-white text-sm md:text-base">
                     Afiliado: <strong className="text-blue-400">{selectedAffiliateForPasswordChange.user_name}</strong>
                   </p>
-                  <p className="text-xs md:text-sm text-slate-400">
-                    Email:{" "}
-                    <span className="text-white font-medium">{selectedAffiliateForPasswordChange.user_email}</span>
-                  </p>
+                  <p className="text-xs md:text-sm text-slate-400">{selectedAffiliateForPasswordChange.user_email}</p>
                 </div>
 
                 <div className="space-y-3">
-                  <Label htmlFor="newAffiliatePassword" className="text-slate-300">
+                  <Label htmlFor="newPassword" className="text-slate-300">
                     Nova Senha
                   </Label>
                   <Input
-                    id="newAffiliatePassword"
+                    id="newPassword"
                     type="password"
                     value={newAffiliatePassword}
                     onChange={(e) => setNewAffiliatePassword(e.target.value)}
-                    placeholder="Digite a nova senha (mín. 6 caracteres)"
+                    placeholder="Digite a nova senha"
                     className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20 h-12"
                   />
-                  {passwordChangeError && (
-                    <Alert className="border-red-500/50 bg-red-500/10 mt-2">
-                      <AlertTriangle className="h-4 w-4 text-red-400" />
-                      <AlertDescription className="text-red-400 text-sm">{passwordChangeError}</AlertDescription>
-                    </Alert>
-                  )}
+                  <p className="text-xs text-slate-400">A senha deve ter pelo menos 6 caracteres</p>
                 </div>
+
+                {passwordChangeError && (
+                  <Alert className="border-red-500/50 bg-red-500/10">
+                    <AlertTriangle className="h-4 w-4 text-red-400" />
+                    <AlertDescription className="text-red-400 text-sm">{passwordChangeError}</AlertDescription>
+                  </Alert>
+                )}
 
                 <div className="flex flex-col md:flex-row gap-4 pt-4">
                   <Button
                     onClick={updateAffiliatePassword}
-                    disabled={isUpdatingAffiliatePassword || !newAffiliatePassword || newAffiliatePassword.length < 6}
+                    disabled={isUpdatingAffiliatePassword || !newAffiliatePassword}
                     className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white h-12"
                   >
                     {isUpdatingAffiliatePassword ? (
                       <>
                         <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                        Salvando...
+                        Alterando...
                       </>
                     ) : (
                       <>
-                        <span className="hidden md:inline">Salvar Nova Senha</span>
-                        <span className="md:hidden">Salvar</span>
+                        <KeyRound className="h-4 w-4 mr-2" />
+                        Alterar Senha
                       </>
                     )}
                   </Button>
@@ -3747,7 +3750,7 @@ export default function AdminConfigPage() {
             <Card className="w-full max-w-md border-red-500/50 bg-slate-900/90 backdrop-blur-xl">
               <CardHeader>
                 <CardTitle className="text-red-400 text-lg md:text-xl flex items-center space-x-3">
-                  <AlertTriangle className="h-5 w-5 md:h-6 md:w-6" />
+                  <AlertTriangle className="h-5 w-5" />
                   <span>Confirmar Exclusão</span>
                 </CardTitle>
               </CardHeader>
@@ -3755,31 +3758,27 @@ export default function AdminConfigPage() {
                 <div className="space-y-3">
                   <p className="text-white text-sm md:text-base">
                     Tem certeza que deseja excluir{" "}
-                    {deleteConfirm.type === "agent"
-                      ? "o agente"
-                      : deleteConfirm.type === "affiliate"
-                        ? "o afiliado"
-                        : "o gerente"}
-                    :
+                    {deleteConfirm.type === "manager"
+                      ? "o gerente"
+                      : deleteConfirm.type === "agent"
+                        ? "o agente"
+                        : "o afiliado"}{" "}
+                    <strong className="text-red-400">{deleteConfirm.name}</strong>?
                   </p>
-                  <p className="text-base md:text-lg font-bold text-red-400">{deleteConfirm.name}</p>
-                  <Alert className="border-red-500/50 bg-red-500/10">
-                    <AlertTriangle className="h-4 w-4 text-red-400" />
-                    <AlertDescription className="text-red-400 text-sm">
-                      Esta ação é irreversível! Todos os dados relacionados serão perdidos.
-                    </AlertDescription>
-                  </Alert>
+                  <p className="text-xs md:text-sm text-slate-400">
+                    Esta ação não pode ser desfeita. Todos os dados relacionados serão removidos permanentemente.
+                  </p>
                 </div>
 
                 <div className="flex flex-col md:flex-row gap-4 pt-4">
                   <Button
                     onClick={() => {
-                      if (deleteConfirm.type === "agent") {
-                        deleteAgent(deleteConfirm.id)
-                      } else if (deleteConfirm.type === "affiliate") {
-                        deleteAffiliate(deleteConfirm.id)
-                      } else if (deleteConfirm.type === "manager") {
+                      if (deleteConfirm.type === "manager") {
                         deleteManager(deleteConfirm.id)
+                      } else if (deleteConfirm.type === "agent") {
+                        deleteAgent(deleteConfirm.id)
+                      } else {
+                        deleteAffiliate(deleteConfirm.id)
                       }
                     }}
                     disabled={actionLoading}
@@ -3793,15 +3792,13 @@ export default function AdminConfigPage() {
                     ) : (
                       <>
                         <Trash2 className="h-4 w-4 mr-2" />
-                        <span className="hidden md:inline">Confirmar Exclusão</span>
-                        <span className="md:hidden">Confirmar</span>
+                        Confirmar Exclusão
                       </>
                     )}
                   </Button>
                   <Button
                     onClick={() => setDeleteConfirm(null)}
                     variant="outline"
-                    disabled={actionLoading}
                     className="flex-1 border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white h-12"
                   >
                     Cancelar
