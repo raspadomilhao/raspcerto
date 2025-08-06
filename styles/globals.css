@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 224 71% 4%; /* Deep Blue-Black */
+    --foreground: 210 40% 98%; /* Light Grey */
+
+    --card: 224 71% 4%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 224 71% 4%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 45 93% 47%; /* Gold */
+    --primary-foreground: 224 71% 4%; /* Dark text for gold buttons */
+
+    --secondary: 224 71% 10%; /* Darker Blue-Black for cards */
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 224 71% 10%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 262 83% 58%; /* Violet */
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 45 93% 47%; /* Gold for rings */
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Same as root for a forced dark theme */
+    --background: 224 71% 4%;
+    --foreground: 210 40% 98%;
+
+    --card: 224 71% 4%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 224 71% 4%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 45 93% 47%;
+    --primary-foreground: 224 71% 4%;
+
+    --secondary: 224 71% 10%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 224 71% 10%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 262 83% 58%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 45 93% 47%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background-image: radial-gradient(ellipse at top, hsl(var(--secondary)) 0%, hsl(var(--background)) 70%);
+    min-height: 100vh;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-glow {
+    text-shadow: 0 0 8px hsl(var(--primary) / 0.8), 0 0 32px hsl(var(--primary) / 0.5);
+  }
+}
