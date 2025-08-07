@@ -11,21 +11,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Shield, Users, DollarSign, TrendingUp, TrendingDown, Gamepad2, RefreshCw, LogOut, Activity, Target, Wallet, Trophy, AlertTriangle, BarChart3, Clock, Info, CheckCircle, XCircle, Loader, Settings, UserCheck, Sparkles, Crown, Zap, Trash2, Star, KeyRound, Menu, X } from 'lucide-react'
 import { toast } from "@/hooks/use-toast"
 import { AuthClient } from "@/lib/auth-client"
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarInset,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-  SidebarRail,
-  SidebarTrigger,
-} from "@/components/ui/sidebar"
 
 // Senha de acesso
 const ADMIN_PASSWORD = "4SS[9zd$r#yJ"
@@ -335,9 +320,6 @@ export default function AdminConfigPage() {
 
   // Estado para controle do menu mobile
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-
-  // Estado para controle da seção ativa do sidebar
-  const [activeSection, setActiveSection] = useState("overview")
 
   // Função de login
   const handleLogin = async () => {
@@ -1394,1747 +1376,806 @@ export default function AdminConfigPage() {
   const pendingCommission = totalCommissionEarned - totalCommissionPaid
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex w-full relative overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-900/10 via-slate-900 to-slate-950"></div>
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-500/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl"></div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-2 md:p-4 relative overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-900/10 via-slate-900 to-slate-950"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-500/5 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl"></div>
 
-        <Sidebar className="border-slate-800/50">
-          <SidebarHeader className="border-b border-slate-800/50 p-4">
-            <div className="flex items-center space-x-3">
+      <div className="max-w-7xl mx-auto space-y-4 md:space-y-8 relative z-10">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-2">
+            <h1 className="text-2xl md:text-4xl font-bold flex items-center space-x-3">
               <div className="p-2 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl">
-                <Shield className="h-6 w-6 text-white" />
+                <Shield className="h-6 w-6 md:h-8 md:w-8 text-white" />
               </div>
-              <div>
-                <h2 className="font-bold text-white text-lg">Admin Panel</h2>
-                <p className="text-xs text-slate-400">Sistema de Gestão</p>
+              <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
+                Painel Administrativo
+              </span>
+              <Badge className="bg-red-500/20 text-red-400 border-red-500/30 px-2 py-1 text-xs">
+                <Sparkles className="h-3 w-3 mr-1" />
+                CONFIDENCIAL
+              </Badge>
+            </h1>
+            <p className="text-slate-400 text-sm md:text-lg">Estatísticas e configurações do sistema</p>
+            {lastUpdate && (
+              <p className="text-xs md:text-sm text-slate-500 flex items-center space-x-2">
+                <Clock className="h-3 w-3 md:h-4 md:w-4 text-amber-500" />
+                <span>Última atualização: {lastUpdate.toLocaleString("pt-BR")}</span>
+              </p>
+            )}
+          </div>
+          <div className="flex items-center space-x-2 md:space-x-4">
+            <Button
+              variant="outline"
+              onClick={fetchStats}
+              disabled={loading}
+              size="sm"
+              className="border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white transition-all duration-300"
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+              <span className="hidden md:inline">Atualizar</span>
+            </Button>
+            <Button
+              onClick={handleLogout}
+              size="sm"
+              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              <span className="hidden md:inline">Sair</span>
+            </Button>
+          </div>
+        </div>
+
+        {loading && !stats ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center space-y-4">
+              <div className="relative">
+                <RefreshCw className="h-12 w-12 animate-spin mx-auto text-amber-500" />
+                <div className="absolute inset-0 h-12 w-12 mx-auto rounded-full bg-amber-500/20 animate-ping"></div>
               </div>
+              <p className="text-slate-400 text-lg">Carregando estatísticas...</p>
             </div>
-          </SidebarHeader>
-          
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupLabel className="text-slate-400 text-xs font-medium px-2 py-2">
-                DASHBOARD
-              </SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      onClick={() => setActiveSection("overview")}
-                      isActive={activeSection === "overview"}
-                      className="w-full justify-start"
-                    >
-                      <BarChart3 className="h-4 w-4" />
-                      <span>Visão Geral</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      onClick={() => setActiveSection("users")}
-                      isActive={activeSection === "users"}
-                      className="w-full justify-start"
-                    >
-                      <Users className="h-4 w-4" />
-                      <span>Usuários</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      onClick={() => setActiveSection("games")}
-                      isActive={activeSection === "games"}
-                      className="w-full justify-start"
-                    >
-                      <Gamepad2 className="h-4 w-4" />
-                      <span>Jogos</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      onClick={() => setActiveSection("financial")}
-                      isActive={activeSection === "financial"}
-                      className="w-full justify-start"
-                    >
-                      <DollarSign className="h-4 w-4" />
-                      <span>Financeiro</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-
-            <SidebarGroup>
-              <SidebarGroupLabel className="text-slate-400 text-xs font-medium px-2 py-2">
-                REDE DE PARCEIROS
-              </SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      onClick={() => setActiveSection("managers")}
-                      isActive={activeSection === "managers"}
-                      className="w-full justify-start"
-                    >
-                      <Star className="h-4 w-4" />
-                      <span>Gerentes ({filteredManagers.length})</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      onClick={() => setActiveSection("agents")}
-                      isActive={activeSection === "agents"}
-                      className="w-full justify-start"
-                    >
-                      <Crown className="h-4 w-4" />
-                      <span>Agentes ({filteredAgents.length})</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      onClick={() => setActiveSection("affiliates")}
-                      isActive={activeSection === "affiliates"}
-                      className="w-full justify-start"
-                    >
-                      <UserCheck className="h-4 w-4" />
-                      <span>Afiliados ({filteredAffiliates.length})</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-
-            <SidebarGroup>
-              <SidebarGroupLabel className="text-slate-400 text-xs font-medium px-2 py-2">
-                SISTEMA
-              </SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      onClick={() => setActiveSection("settings")}
-                      isActive={activeSection === "settings"}
-                      className="w-full justify-start"
-                    >
-                      <Settings className="h-4 w-4" />
-                      <span>Configurações</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      onClick={() => setActiveSection("reset")}
-                      isActive={activeSection === "reset"}
-                      className="w-full justify-start text-red-400 hover:text-red-300"
-                    >
-                      <AlertTriangle className="h-4 w-4" />
-                      <span>Reset</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
-          <SidebarRail />
-        </Sidebar>
-
-        <SidebarInset className="flex-1">
-          <header className="flex h-16 shrink-0 items-center gap-2 border-b border-slate-800/50 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <div className="flex items-center space-x-4 flex-1">
-              <div className="space-y-1">
-                <h1 className="text-xl md:text-2xl font-bold flex items-center space-x-2">
-                  <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
-                    Painel Administrativo
-                  </span>
-                  <Badge className="bg-red-500/20 text-red-400 border-red-500/30 px-2 py-1 text-xs">
-                    <Sparkles className="h-3 w-3 mr-1" />
-                    CONFIDENCIAL
-                  </Badge>
-                </h1>
-                {lastUpdate && (
-                  <p className="text-xs text-slate-500 flex items-center space-x-2">
-                    <Clock className="h-3 w-3 text-amber-500" />
-                    <span>Última atualização: {lastUpdate.toLocaleString("pt-BR")}</span>
-                  </p>
-                )}
-              </div>
-              <div className="ml-auto flex items-center space-x-2">
-                <Button
-                  variant="outline"
-                  onClick={fetchStats}
-                  disabled={loading}
-                  size="sm"
-                  className="border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white transition-all duration-300"
+          </div>
+        ) : stats ? (
+          <Tabs defaultValue="overview" className="space-y-4 md:space-y-8">
+            {/* Tabs responsivas */}
+            <div className="relative">
+              <TabsList className="grid w-full grid-cols-3 md:grid-cols-9 bg-slate-800/50 border-slate-700 p-1 rounded-xl text-xs md:text-sm overflow-x-auto touch-pan-x">
+                <TabsTrigger
+                  value="overview"
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400 hover:text-white transition-all duration-300 px-2 py-2"
                 >
-                  <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-                  <span className="hidden md:inline">Atualizar</span>
-                </Button>
-                <Button
-                  onClick={handleLogout}
-                  size="sm"
-                  className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                  <span className="md:hidden">Geral</span>
+                  <span className="hidden md:inline">Visão Geral</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="users"
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400 hover:text-white transition-all duration-300 px-2 py-2"
                 >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  <span className="hidden md:inline">Sair</span>
-                </Button>
-              </div>
+                  Usuários
+                </TabsTrigger>
+                <TabsTrigger
+                  value="games"
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400 hover:text-white transition-all duration-300 px-2 py-2"
+                >
+                  Jogos
+                </TabsTrigger>
+                <TabsTrigger
+                  value="financial"
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400 hover:text-white transition-all duration-300 px-2 py-2"
+                >
+                  <span className="md:hidden">Fin.</span>
+                  <span className="hidden md:inline">Financeiro</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="managers"
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400 hover:text-white transition-all duration-300 px-2 py-2"
+                >
+                  <span className="md:hidden">Ger. ({filteredManagers.length})</span>
+                  <span className="hidden md:inline">Gerentes ({filteredManagers.length})</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="agents"
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400 hover:text-white transition-all duration-300 px-2 py-2"
+                >
+                  <span className="md:hidden">Ag. ({filteredAgents.length})</span>
+                  <span className="hidden md:inline">Agentes ({filteredAgents.length})</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="affiliates"
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400 hover:text-white transition-all duration-300 px-2 py-2"
+                >
+                  <span className="md:hidden">Af. ({filteredAffiliates.length})</span>
+                  <span className="hidden md:inline">Afiliados ({filteredAffiliates.length})</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="settings"
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400 hover:text-white transition-all duration-300 px-2 py-2"
+                >
+                  <span className="md:hidden">Config</span>
+                  <span className="hidden md:inline">Configurações</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="reset"
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-red-600 data-[state=active]:text-white text-slate-400 hover:text-white transition-all duration-300 px-2 py-2"
+                >
+                  Reset
+                </TabsTrigger>
+              </TabsList>
             </div>
-          </header>
 
-          <div className="flex-1 overflow-auto p-4 space-y-8 relative z-10">
-            {loading && !stats ? (
-              <div className="flex items-center justify-center py-20">
-                <div className="text-center space-y-4">
-                  <div className="relative">
-                    <RefreshCw className="h-12 w-12 animate-spin mx-auto text-amber-500" />
-                    <div className="absolute inset-0 h-12 w-12 mx-auto rounded-full bg-amber-500/20 animate-ping"></div>
-                  </div>
-                  <p className="text-slate-400 text-lg">Carregando estatísticas...</p>
-                </div>
-              </div>
-            ) : stats ? (
-              <>
-                {/* Visão Geral */}
-                {activeSection === "overview" && (
-                  <div className="space-y-8">
-                    {/* Alerta de erro HorsePay se houver */}
-                    {stats.financial.horsepay_error && (
-                      <Alert className="border-red-500/50 bg-red-500/10">
-                        <AlertTriangle className="h-4 w-4 text-red-400" />
-                        <AlertDescription className="text-red-400 text-sm">
-                          <strong>Erro ao consultar saldo HorsePay:</strong> {stats.financial.horsepay_error}
-                        </AlertDescription>
-                      </Alert>
-                    )}
+            {/* Visão Geral */}
+            <TabsContent value="overview" className="space-y-4 md:space-y-8">
+              {/* Alerta de erro HorsePay se houver */}
+              {stats.financial.horsepay_error && (
+                <Alert className="border-red-500/50 bg-red-500/10">
+                  <AlertTriangle className="h-4 w-4 text-red-400" />
+                  <AlertDescription className="text-red-400 text-sm">
+                    <strong>Erro ao consultar saldo HorsePay:</strong> {stats.financial.horsepay_error}
+                  </AlertDescription>
+                </Alert>
+              )}
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                      {/* Usuários Totais */}
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm hover:bg-slate-900/70 transition-all duration-300 group">
-                        <CardContent className="p-6">
-                          <div className="flex items-center space-x-4">
-                            <div className="p-3 bg-blue-500/20 rounded-xl group-hover:bg-blue-500/30 transition-colors">
-                              <Users className="h-8 w-8 text-blue-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-slate-400">Usuários Totais</p>
-                              <p className="text-3xl font-bold text-white">{stats.users.total.toLocaleString()}</p>
-                              <p className="text-xs text-emerald-400">+{stats.users.new_this_week} esta semana</p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      {/* Volume Total */}
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm hover:bg-slate-900/70 transition-all duration-300 group">
-                        <CardContent className="p-6">
-                          <div className="flex items-center space-x-4">
-                            <div className="p-3 bg-emerald-500/20 rounded-xl group-hover:bg-emerald-500/30 transition-colors">
-                              <DollarSign className="h-8 w-8 text-emerald-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-slate-400">Volume Total</p>
-                              <p className="text-3xl font-bold text-white">
-                                {formatCurrency(stats.transactions.total_volume)}
-                              </p>
-                              <p className="text-xs text-blue-400">{stats.transactions.total} transações</p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      {/* Receita Mensal */}
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm hover:bg-slate-900/70 transition-all duration-300 group">
-                        <CardContent className="p-6">
-                          <div className="flex items-center space-x-4">
-                            <div className="p-3 bg-violet-500/20 rounded-xl group-hover:bg-violet-500/30 transition-colors">
-                              <TrendingUp className="h-8 w-8 text-violet-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-slate-400">Receita Mensal</p>
-                              <p className="text-3xl font-bold text-white">
-                                {formatCurrency(stats.financial.monthly_revenue)}
-                              </p>
-                              <p className="text-xs text-emerald-400">Margem: {formatPercent(stats.games.profit_margin)}</p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      {/* Saldo HorsePay */}
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm hover:bg-slate-900/70 transition-all duration-300 group">
-                        <CardContent className="p-6">
-                          <div className="flex items-center space-x-4">
-                            <div className="p-3 bg-amber-500/20 rounded-xl group-hover:bg-amber-500/30 transition-colors">
-                              <Wallet className="h-8 w-8 text-amber-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-slate-400">Saldo HorsePay</p>
-                              <p className="text-3xl font-bold text-white">
-                                {formatCurrency(stats.financial.horsepay_balance)}
-                              </p>
-                              <p className="text-xs text-slate-500">
-                                {stats.financial.horsepay_error ? "Erro na consulta" : "Saldo real na carteira"}
-                              </p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                {/* Usuários Totais */}
+                <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm hover:bg-slate-900/70 transition-all duration-300 group">
+                  <CardContent className="p-4 md:p-6">
+                    <div className="flex items-center space-x-3 md:space-x-4">
+                      <div className="p-2 md:p-3 bg-blue-500/20 rounded-xl group-hover:bg-blue-500/30 transition-colors">
+                        <Users className="h-6 w-6 md:h-8 md:w-8 text-blue-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs md:text-sm font-medium text-slate-400">Usuários Totais</p>
+                        <p className="text-xl md:text-3xl font-bold text-white">{stats.users.total.toLocaleString()}</p>
+                        <p className="text-xs text-emerald-400">+{stats.users.new_this_week} esta semana</p>
+                      </div>
                     </div>
+                  </CardContent>
+                </Card>
 
-                    {/* Atividades Recentes */}
-                    <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                      <CardHeader>
-                        <CardTitle className="flex items-center space-x-3 text-white text-xl">
-                          <div className="p-2 bg-amber-500/20 rounded-lg">
-                            <Activity className="h-5 w-5 text-amber-400" />
+                {/* Volume Total */}
+                <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm hover:bg-slate-900/70 transition-all duration-300 group">
+                  <CardContent className="p-4 md:p-6">
+                    <div className="flex items-center space-x-3 md:space-x-4">
+                      <div className="p-2 md:p-3 bg-emerald-500/20 rounded-xl group-hover:bg-emerald-500/30 transition-colors">
+                        <DollarSign className="h-6 w-6 md:h-8 md:w-8 text-emerald-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs md:text-sm font-medium text-slate-400">Volume Total</p>
+                        <p className="text-xl md:text-3xl font-bold text-white">
+                          {formatCurrency(stats.transactions.total_volume)}
+                        </p>
+                        <p className="text-xs text-blue-400">{stats.transactions.total} transações</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Receita Mensal */}
+                <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm hover:bg-slate-900/70 transition-all duration-300 group">
+                  <CardContent className="p-4 md:p-6">
+                    <div className="flex items-center space-x-3 md:space-x-4">
+                      <div className="p-2 md:p-3 bg-violet-500/20 rounded-xl group-hover:bg-violet-500/30 transition-colors">
+                        <TrendingUp className="h-6 w-6 md:h-8 md:w-8 text-violet-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs md:text-sm font-medium text-slate-400">Receita Mensal</p>
+                        <p className="text-xl md:text-3xl font-bold text-white">
+                          {formatCurrency(stats.financial.monthly_revenue)}
+                        </p>
+                        <p className="text-xs text-emerald-400">Margem: {formatPercent(stats.games.profit_margin)}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Saldo HorsePay */}
+                <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm hover:bg-slate-900/70 transition-all duration-300 group">
+                  <CardContent className="p-4 md:p-6">
+                    <div className="flex items-center space-x-3 md:space-x-4">
+                      <div className="p-2 md:p-3 bg-amber-500/20 rounded-xl group-hover:bg-amber-500/30 transition-colors">
+                        <Wallet className="h-6 w-6 md:h-8 md:w-8 text-amber-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs md:text-sm font-medium text-slate-400">Saldo HorsePay</p>
+                        <p className="text-xl md:text-3xl font-bold text-white">
+                          {formatCurrency(stats.financial.horsepay_balance)}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {stats.financial.horsepay_error ? "Erro na consulta" : "Saldo real na carteira"}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Atividades Recentes */}
+              <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-3 text-white text-lg md:text-xl">
+                    <div className="p-2 bg-amber-500/20 rounded-lg">
+                      <Activity className="h-4 w-4 md:h-5 md:w-5 text-amber-400" />
+                    </div>
+                    <span>Atividades Recentes</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3 md:space-y-4 max-h-96 overflow-y-auto">
+                    {stats.recent_activities.map((activity) => (
+                      <div
+                        key={activity.id}
+                        className="flex flex-col md:flex-row md:items-center justify-between p-3 md:p-4 bg-slate-800/30 rounded-xl border border-slate-700/50 hover:bg-slate-800/50 transition-colors gap-3 md:gap-4"
+                      >
+                        <div className="flex items-center space-x-3 md:space-x-4">
+                          <div
+                            className={`p-2 md:p-3 rounded-xl ${
+                              activity.type === "deposit"
+                                ? "bg-emerald-500/20"
+                                : activity.type === "withdraw"
+                                  ? "bg-red-500/20"
+                                  : activity.type === "game"
+                                    ? "bg-blue-500/20"
+                                    : "bg-slate-500/20"
+                            }`}
+                          >
+                            {activity.type === "deposit" && <TrendingUp className="h-4 w-4 md:h-5 md:w-5 text-emerald-400" />}
+                            {activity.type === "withdraw" && <TrendingDown className="h-4 w-4 md:h-5 md:w-5 text-red-400" />}
+                            {activity.type === "game" && <Gamepad2 className="h-4 w-4 md:h-5 md:w-5 text-blue-400" />}
+                            {activity.type === "user" && <Users className="h-4 w-4 md:h-5 md:w-5 text-slate-400" />}
                           </div>
-                          <span>Atividades Recentes</span>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4 max-h-96 overflow-y-auto">
-                          {stats.recent_activities.map((activity) => (
-                            <div
-                              key={activity.id}
-                              className="flex items-center justify-between p-4 bg-slate-800/30 rounded-xl border border-slate-700/50 hover:bg-slate-800/50 transition-colors"
-                            >
-                              <div className="flex items-center space-x-4">
-                                <div
-                                  className={`p-3 rounded-xl ${
-                                    activity.type === "deposit"
-                                      ? "bg-emerald-500/20"
-                                      : activity.type === "withdraw"
-                                        ? "bg-red-500/20"
-                                        : activity.type === "game"
-                                          ? "bg-blue-500/20"
-                                          : "bg-slate-500/20"
-                                  }`}
-                                >
-                                  {activity.type === "deposit" && <TrendingUp className="h-5 w-5 text-emerald-400" />}
-                                  {activity.type === "withdraw" && <TrendingDown className="h-5 w-5 text-red-400" />}
-                                  {activity.type === "game" && <Gamepad2 className="h-5 w-5 text-blue-400" />}
-                                  {activity.type === "user" && <Users className="h-5 w-5 text-slate-400" />}
-                                </div>
-                                <div>
-                                  <p className="font-medium text-white">{activity.description}</p>
-                                  {activity.user_email && <p className="text-sm text-slate-400">{activity.user_email}</p>}
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                {activity.amount && (
-                                  <p className="font-bold text-emerald-400">{formatCurrency(activity.amount)}</p>
-                                )}
-                                <p className="text-xs text-slate-500">
-                                  {new Date(activity.created_at).toLocaleString("pt-BR")}
-                                </p>
-                              </div>
-                            </div>
-                          ))}
+                          <div>
+                            <p className="font-medium text-white text-sm md:text-base">{activity.description}</p>
+                            {activity.user_email && <p className="text-xs md:text-sm text-slate-400">{activity.user_email}</p>}
+                          </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                )}
-
-                {/* Usuários */}
-                {activeSection === "users" && (
-                  <div className="space-y-8">
-                    <div className="mb-6">
-                      <Alert className="border-blue-500/50 bg-blue-500/10">
-                        <Info className="h-4 w-4 text-blue-400" />
-                        <AlertDescription className="text-blue-400 text-sm">
-                          📊 <strong>Dados Limpos:</strong> As estatísticas excluem contas blogger para mostrar apenas dados
-                          reais do negócio.
-                          {stats.users.blogger_count > 0 && (
-                            <span className="ml-2 text-slate-400">
-                              ({stats.users.blogger_count} conta{stats.users.blogger_count > 1 ? "s" : ""} blogger excluída
-                              {stats.users.blogger_count > 1 ? "s" : ""})
-                            </span>
+                        <div className="text-left md:text-right">
+                          {activity.amount && (
+                            <p className="font-bold text-emerald-400 text-sm md:text-base">{formatCurrency(activity.amount)}</p>
                           )}
-                        </AlertDescription>
-                      </Alert>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardHeader>
-                          <CardTitle className="flex items-center space-x-3 text-white text-lg">
-                            <div className="p-2 bg-blue-500/20 rounded-lg">
-                              <Users className="h-5 w-5 text-blue-400" />
-                            </div>
-                            <span>Usuários Regulares</span>
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-4xl font-bold mb-4 text-white">{stats.users.total.toLocaleString()}</div>
-                          <div className="space-y-3 text-sm">
-                            <div className="flex justify-between">
-                              <span className="text-slate-400">Ativos hoje:</span>
-                              <span className="font-medium text-white">{stats.users.active_today}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-slate-400">Novos esta semana:</span>
-                              <span className="font-medium text-emerald-400">+{stats.users.new_this_week}</span>
-                            </div>
-                            {stats.users.blogger_count > 0 && (
-                              <div className="flex justify-between">
-                                <span className="text-slate-400">Contas blogger:</span>
-                                <span className="font-medium text-slate-500">{stats.users.blogger_count} (excluídas)</span>
-                              </div>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardHeader>
-                          <CardTitle className="text-white text-lg">Taxa de Crescimento</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-3xl font-bold text-emerald-400 mb-2">
-                            {stats.users.total > 0
-                              ? ((stats.users.new_this_week / stats.users.total) * 100).toFixed(1)
-                              : "0.0"}
-                            %
-                          </div>
-                          <p className="text-sm text-slate-400">Crescimento semanal</p>
-                        </CardContent>
-                      </Card>
-
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardHeader>
-                          <CardTitle className="text-white text-lg">Engajamento</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-3xl font-bold text-blue-400 mb-2">
-                            {stats.users.total > 0
-                              ? ((stats.users.active_today / stats.users.total) * 100).toFixed(1)
-                              : "0.0"}
-                            %
-                          </div>
-                          <p className="text-sm text-slate-400">Usuários ativos hoje</p>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </div>
-                )}
-
-                {/* Jogos */}
-                {activeSection === "games" && (
-                  <div className="space-y-8">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardContent className="p-6">
-                          <div className="flex items-center space-x-4">
-                            <div className="p-3 bg-violet-500/20 rounded-xl">
-                              <Gamepad2 className="h-6 w-6 text-violet-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm text-slate-400">Total de Jogadas</p>
-                              <p className="text-2xl font-bold text-white">{stats.games.total_plays.toLocaleString()}</p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardContent className="p-6">
-                          <div className="flex items-center space-x-4">
-                            <div className="p-3 bg-blue-500/20 rounded-xl">
-                              <DollarSign className="h-6 w-6 text-blue-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm text-slate-400">Total Apostado</p>
-                              <p className="text-2xl font-bold text-white">{formatCurrency(stats.games.total_spent)}</p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardContent className="p-6">
-                          <div className="flex items-center space-x-4">
-                            <div className="p-3 bg-amber-500/20 rounded-xl">
-                              <Trophy className="h-6 w-6 text-amber-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm text-slate-400">Total Ganho</p>
-                              <p className="text-2xl font-bold text-amber-400">{formatCurrency(stats.games.total_won)}</p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardContent className="p-6">
-                          <div className="flex items-center space-x-4">
-                            <div className="p-3 bg-emerald-500/20 rounded-xl">
-                              <Target className="h-6 w-6 text-emerald-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm text-slate-400">Margem de Lucro</p>
-                              <p className="text-2xl font-bold text-emerald-400">
-                                {formatPercent(stats.games.profit_margin)}
-                              </p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-
-                    {/* Breakdown por jogo */}
-                    <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                      <CardHeader>
-                        <CardTitle className="flex items-center space-x-3 text-white text-xl">
-                          <div className="p-2 bg-amber-500/20 rounded-lg">
-                            <BarChart3 className="h-5 w-5 text-amber-400" />
-                          </div>
-                          <span>Performance por Jogo</span>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-6">
-                          {Object.entries(stats.games.games_breakdown).map(([gameName, gameStats]) => (
-                            <div key={gameName} className="p-6 bg-slate-800/30 rounded-xl border border-slate-700/50">
-                              <div className="flex items-center justify-between mb-4">
-                                <h3 className="font-semibold text-xl text-white">{gameName}</h3>
-                                <Badge className="bg-slate-700/50 text-slate-300 border-slate-600 px-3 py-1">
-                                  {gameStats.plays} jogadas
-                                </Badge>
-                              </div>
-                              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
-                                <div>
-                                  <p className="text-slate-400 font-medium mb-1">Apostado</p>
-                                  <p className="font-bold text-blue-400 text-lg">{formatCurrency(gameStats.spent)}</p>
-                                </div>
-                                <div>
-                                  <p className="text-slate-400 font-medium mb-1">Ganho</p>
-                                  <p className="font-bold text-amber-400 text-lg">{formatCurrency(gameStats.won)}</p>
-                                </div>
-                                <div>
-                                  <p className="text-slate-400 font-medium mb-1">Lucro</p>
-                                  <p className="font-bold text-emerald-400 text-lg">{formatCurrency(gameStats.profit)}</p>
-                                </div>
-                                <div>
-                                  <p className="text-slate-400 font-medium mb-1">Margem</p>
-                                  <p className="font-bold text-white text-lg">
-                                    {formatPercent((gameStats.profit / gameStats.spent) * 100)}
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                )}
-
-                {/* Financeiro */}
-                {activeSection === "financial" && (
-                  <div className="space-y-8">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardHeader>
-                          <CardTitle className="text-emerald-400 text-lg">Saldo da Plataforma</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-4xl font-bold text-emerald-400 mb-2">
-                            {formatCurrency(stats.financial.platform_balance)}
-                          </div>
-                          <p className="text-sm text-slate-400">Saldo total da plataforma</p>
-                        </CardContent>
-                      </Card>
-
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardHeader>
-                          <CardTitle className="text-blue-400 text-lg">Saldo Disponível</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-4xl font-bold text-blue-400 mb-2">
-                            {formatCurrency(stats.financial.available_balance)}
-                          </div>
-                          <p className="text-sm text-slate-400">Disponível para operações</p>
-                        </CardContent>
-                      </Card>
-
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardHeader>
-                          <CardTitle className="text-amber-400 text-lg">Saldo HorsePay</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-4xl font-bold text-amber-400 mb-2">
-                            {formatCurrency(stats.financial.horsepay_balance)}
-                          </div>
-                          <p className="text-sm text-slate-400">
-                            {stats.financial.horsepay_error ? "Erro na consulta" : "Saldo real na carteira"}
+                          <p className="text-xs text-slate-500">
+                            {new Date(activity.created_at).toLocaleString("pt-BR")}
                           </p>
-                          {stats.financial.horsepay_error && (
-                            <p className="text-xs text-red-400 mt-1">{stats.financial.horsepay_error}</p>
-                          )}
-                        </CardContent>
-                      </Card>
-
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardHeader>
-                          <CardTitle className="text-red-400 text-lg">Saques Pendentes</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-4xl font-bold text-red-400 mb-2">
-                            {formatCurrency(stats.financial.pending_withdraws)}
-                          </div>
-                          <p className="text-sm text-slate-400">Aguardando processamento</p>
-                        </CardContent>
-                      </Card>
-
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardHeader>
-                          <CardTitle className="text-violet-400 text-lg">Receita Diária</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-3xl font-bold text-violet-400 mb-2">
-                            {formatCurrency(stats.financial.daily_revenue)}
-                          </div>
-                          <p className="text-sm text-slate-400">Receita de hoje</p>
-                        </CardContent>
-                      </Card>
-
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardHeader>
-                          <CardTitle className="text-indigo-400 text-lg">Receita Semanal</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-3xl font-bold text-indigo-400 mb-2">
-                            {formatCurrency(stats.financial.weekly_revenue)}
-                          </div>
-                          <p className="text-sm text-slate-400">Receita desta semana</p>
-                        </CardContent>
-                      </Card>
-
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardHeader>
-                          <CardTitle className="text-emerald-400 text-lg">Receita Mensal</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-3xl font-bold text-emerald-400 mb-2">
-                            {formatCurrency(stats.financial.monthly_revenue)}
-                          </div>
-                          <p className="text-sm text-slate-400">Receita deste mês</p>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </div>
-                )}
-
-                {/* Gerentes */}
-                {activeSection === "managers" && (
-                  <div className="space-y-8">
-                    {/* Header da seção de gerentes */}
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h2 className="text-3xl font-bold text-white flex items-center space-x-3">
-                          <div className="p-2 bg-yellow-500/20 rounded-xl">
-                            <Star className="h-6 w-6 text-yellow-400" />
-                          </div>
-                          <span>Gerenciar Gerentes</span>
-                        </h2>
-                        <p className="text-slate-400 text-lg">Administre a rede de gerentes</p>
-                      </div>
-                      <Button
-                        variant="outline"
-                        onClick={fetchManagersData}
-                        disabled={managersLoading}
-                        size="sm"
-                        className="border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white transition-all duration-300"
-                      >
-                        <RefreshCw className={`h-4 w-4 mr-2 ${managersLoading ? "animate-spin" : ""}`} />
-                        Atualizar Gerentes
-                      </Button>
-                    </div>
-
-                    {/* Campo de busca para gerentes */}
-                    <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                      <CardContent className="p-4">
-                        <div className="flex items-center space-x-4">
-                          <div className="flex-1">
-                            <Input
-                              placeholder="Buscar gerente por nome, email ou código..."
-                              value={managerSearchTerm}
-                              onChange={(e) => setManagerSearchTerm(e.target.value)}
-                              className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-yellow-500 focus:ring-yellow-500/20"
-                            />
-                          </div>
-                          {managerSearchTerm && (
-                            <Button
-                              onClick={() => setManagerSearchTerm("")}
-                              variant="outline"
-                              size="sm"
-                              className="border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white"
-                            >
-                              <XCircle className="h-4 w-4" />
-                            </Button>
-                          )}
                         </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* Stats Cards dos Gerentes */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardContent className="p-6">
-                          <div className="flex items-center space-x-4">
-                            <div className="p-3 bg-yellow-500/20 rounded-xl">
-                              <Star className="h-8 w-8 text-yellow-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-slate-400">Total de Gerentes</p>
-                              <p className="text-3xl font-bold text-white">{managers.length}</p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardContent className="p-6">
-                          <div className="flex items-center space-x-4">
-                            <div className="p-3 bg-purple-500/20 rounded-xl">
-                              <Crown className="h-8 w-8 text-purple-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-slate-400">Total Agentes</p>
-                              <p className="text-3xl font-bold text-white">
-                                {managers.reduce((sum, manager) => sum + Number(manager.total_agents || 0), 0)}
-                              </p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardContent className="p-6">
-                          <div className="flex items-center space-x-4">
-                            <div className="p-3 bg-emerald-500/20 rounded-xl">
-                              <DollarSign className="h-8 w-8 text-emerald-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-slate-400">Comissão Total</p>
-                              <p className="text-3xl font-bold text-white">
-                                {formatCurrency(
-                                  managers.reduce((sum, manager) => sum + Number(manager.total_commission_earned || 0), 0),
-                                )}
-                              </p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardContent className="p-6">
-                          <div className="flex items-center space-x-4">
-                            <div className="p-3 bg-amber-500/20 rounded-xl">
-                              <Clock className="h-8 w-8 text-amber-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-slate-400">Saques Pendentes</p>
-                              <p className="text-3xl font-bold text-amber-400">{managerWithdrawals.length}</p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-
-                    {/* Tabs dos Gerentes */}
-                    <Tabs defaultValue="managers-list" className="space-y-6">
-                      <TabsList className="bg-slate-800/50 border-slate-700 grid grid-cols-3 w-full">
-                        <TabsTrigger
-                          value="managers-list"
-                          className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400"
-                        >
-                          Gerentes ({filteredManagers.length})
-                        </TabsTrigger>
-                        <TabsTrigger
-                          value="create-manager"
-                          className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400"
-                        >
-                          Criar Gerente
-                        </TabsTrigger>
-                        <TabsTrigger
-                          value="manager-withdrawals"
-                          className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400"
-                        >
-                          Saques Pendentes ({managerWithdrawals.length})
-                        </TabsTrigger>
-                      </TabsList>
-
-                      <TabsContent value="managers-list">
-                        <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                          <CardHeader>
-                            <CardTitle className="text-white text-lg">Lista de Gerentes</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            {managersLoading ? (
-                              <div className="flex items-center justify-center py-12">
-                                <div className="text-center space-y-4">
-                                  <RefreshCw className="h-12 w-12 animate-spin text-amber-500 mx-auto" />
-                                  <span className="text-slate-400 text-lg">Carregando gerentes...</span>
-                                </div>
-                              </div>
-                            ) : filteredManagers.length > 0 ? (
-                              <div className="space-y-6">
-                                {filteredManagers.map((manager) => (
-                                  <div
-                                    key={manager.id}
-                                    className="p-6 bg-slate-800/30 rounded-xl border border-slate-700/50"
-                                  >
-                                    <div className="flex flex-col gap-4">
-                                      <div className="flex items-center justify-between">
-                                        <div className="flex-1">
-                                          <div className="flex items-center gap-4 mb-3">
-                                            <h3 className="font-bold text-white text-lg">{manager.user_name}</h3>
-                                            {getStatusBadge(manager.status)}
-                                          </div>
-                                          <p className="text-slate-400 mb-4">{manager.user_email}</p>
-                                        </div>
-                                        <div className="flex gap-2">
-                                          <Button
-                                            onClick={() => {
-                                              setSelectedManager(manager)
-                                              setNewManagerCommissionRate(manager.commission_rate.toString())
-                                            }}
-                                            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
-                                            size="sm"
-                                          >
-                                            <Settings className="h-4 w-4 mr-1" />
-                                            Editar
-                                          </Button>
-                                          <Button
-                                            onClick={() => toggleManagerStatus(manager.id, manager.status)}
-                                            disabled={actionLoading}
-                                            variant="outline"
-                                            size="sm"
-                                            className={`border-slate-700 ${
-                                              manager.status === "active"
-                                                ? "bg-red-500/20 text-red-400 hover:bg-red-500/30"
-                                                : "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
-                                            }`}
-                                          >
-                                            {manager.status === "active" ? (
-                                              <>
-                                                <XCircle className="h-4 w-4 mr-1" />
-                                                Desativar
-                                              </>
-                                            ) : (
-                                              <>
-                                                <CheckCircle className="h-4 w-4 mr-1" />
-                                                Ativar
-                                              </>
-                                            )}
-                                          </Button>
-                                          <Button
-                                            onClick={() =>
-                                              setDeleteConfirm({ type: "manager", id: manager.id, name: manager.user_name })
-                                            }
-                                            variant="outline"
-                                            size="sm"
-                                            className="border-red-500/50 bg-red-500/10 text-red-400 hover:bg-red-500/20"
-                                          >
-                                            <Trash2 className="h-4 w-4 mr-1" />
-                                            Excluir
-                                          </Button>
-                                        </div>
-                                      </div>
-                                      <div className="grid grid-cols-2 md:grid-cols-5 gap-6 text-sm">
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Código</p>
-                                          <p className="text-yellow-400 font-mono font-medium">{manager.manager_code}</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Comissão</p>
-                                          <p className="font-medium text-white">{manager.commission_rate}%</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Agentes</p>
-                                          <p className="font-medium text-white">{manager.total_agents}</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Ganhou</p>
-                                          <p className="text-emerald-400 font-medium">
-                                            {formatCurrency(manager.total_commission_earned)}
-                                          </p>
-                                        </div>
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Saldo Disponível</p>
-                                          <p className="text-blue-400 font-medium">
-                                            {formatCurrency(
-                                              Number(manager.total_commission_earned || 0) -
-                                                Number(manager.total_commission_paid || 0),
-                                            )}
-                                          </p>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="text-center py-12">
-                                <Star className="h-20 w-20 text-slate-600 mx-auto mb-6" />
-                                <p className="text-slate-400 text-lg mb-4">Nenhum gerente cadastrado ainda</p>
-                                <Button
-                                  onClick={fetchManagersData}
-                                  className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
-                                >
-                                  Carregar Gerentes
-                                </Button>
-                              </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      </TabsContent>
-
-                      <TabsContent value="create-manager">
-                        <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                          <CardHeader>
-                            <CardTitle className="text-white text-lg">Criar Novo Gerente</CardTitle>
-                          </CardHeader>
-                          <CardContent className="space-y-6">
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                              <div className="space-y-4">
-                                <div>
-                                  <Label htmlFor="managerEmail" className="text-slate-300">
-                                    Email do Usuário
-                                  </Label>
-                                  <Input
-                                    id="managerEmail"
-                                    type="email"
-                                    value={newManagerEmail}
-                                    onChange={(e) => setNewManagerEmail(e.target.value)}
-                                    className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500"
-                                    placeholder="Digite o email do usuário"
-                                  />
-                                </div>
-
-                                <div>
-                                  <Label htmlFor="managerCommission" className="text-slate-300">
-                                    Taxa de Comissão (%)
-                                  </Label>
-                                  <Input
-                                    id="managerCommission"
-                                    type="number"
-                                    min="1"
-                                    max="20"
-                                    step="0.1"
-                                    value={newManagerCommissionRate}
-                                    onChange={(e) => setNewManagerCommissionRate(e.target.value)}
-                                    className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500"
-                                    placeholder="5.0"
-                                  />
-                                </div>
-
-                                <Button
-                                  onClick={createManager}
-                                  disabled={createManagerLoading || !newManagerEmail}
-                                  className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold h-12"
-                                >
-                                  {createManagerLoading ? (
-                                    <>
-                                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                                      Criando...
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Star className="h-4 w-4 mr-2" />
-                                      Criar Gerente
-                                    </>
-                                  )}
-                                </Button>
-                              </div>
-
-                              <div className="bg-slate-800/30 rounded-lg p-6">
-                                <h4 className="text-yellow-400 font-bold mb-4">Informações Importantes</h4>
-                                <ul className="text-gray-300 text-sm space-y-2">
-                                  <li>• O usuário deve estar cadastrado no sistema</li>
-                                  <li>• Gerentes podem criar e gerenciar agentes</li>
-                                  <li>• Taxa padrão de comissão é 5%</li>
-                                  <li>• Gerentes acessam o painel em /gerente</li>
-                                  <li>• Apenas admins podem criar gerentes</li>
-                                </ul>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </TabsContent>
-
-                      <TabsContent value="manager-withdrawals">
-                        <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                          <CardHeader>
-                            <CardTitle className="text-white text-lg">Solicitações de Saque de Gerentes</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            {managerWithdrawals.length > 0 ? (
-                              <div className="space-y-6">
-                                {managerWithdrawals.map((withdrawal) => (
-                                  <div
-                                    key={withdrawal.id}
-                                    className="p-6 bg-slate-800/30 rounded-xl border border-slate-700/50"
-                                  >
-                                    <div className="flex flex-col gap-4">
-                                      <div className="flex items-center justify-between">
-                                        <div className="flex-1">
-                                          <div className="flex items-center gap-4 mb-3">
-                                            <h3 className="font-bold text-white text-lg">{withdrawal.manager_name}</h3>
-                                            {getStatusBadge(withdrawal.status)}
-                                          </div>
-                                          <p className="text-slate-400 mb-4">{withdrawal.manager_email}</p>
-                                        </div>
-                                        <div className="flex flex-col gap-2">
-                                          <Button
-                                            onClick={() => processManagerWithdrawal(withdrawal.id, "processing")}
-                                            variant="outline"
-                                            size="sm"
-                                            className="border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white"
-                                          >
-                                            <Settings className="h-4 w-4 mr-2" />
-                                            Processar
-                                          </Button>
-                                          <Button
-                                            onClick={() => processManagerWithdrawal(withdrawal.id, "completed")}
-                                            className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white"
-                                            size="sm"
-                                          >
-                                            <CheckCircle className="h-4 w-4 mr-2" />
-                                            Concluir
-                                          </Button>
-                                          <Button
-                                            onClick={() =>
-                                              processManagerWithdrawal(
-                                                withdrawal.id,
-                                                "cancelled",
-                                                "Cancelado pelo administrador",
-                                              )
-                                            }
-                                            className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
-                                            size="sm"
-                                          >
-                                            <XCircle className="h-4 w-4 mr-2" />
-                                            Cancelar
-                                          </Button>
-                                        </div>
-                                      </div>
-                                      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Valor</p>
-                                          <p className="text-emerald-400 font-bold text-lg">
-                                            {formatCurrency(withdrawal.amount)}
-                                          </p>
-                                        </div>
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Chave PIX</p>
-                                          <p className="font-mono text-white text-sm break-all">{withdrawal.pix_key}</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Tipo</p>
-                                          <p className="uppercase text-white">{withdrawal.pix_type}</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Solicitado em</p>
-                                          <p className="text-white text-sm">{formatDate(withdrawal.created_at)}</p>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="text-center py-12">
-                                <Clock className="h-20 w-20 text-slate-600 mx-auto mb-6" />
-                                <p className="text-slate-400 text-lg">Nenhuma solicitação de saque pendente</p>
-                              </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      </TabsContent>
-                    </Tabs>
-                  </div>
-                )}
-
-                {/* Agentes */}
-                {activeSection === "agents" && (
-                  <div className="space-y-8">
-                    {/* Header da seção de agentes */}
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h2 className="text-3xl font-bold text-white flex items-center space-x-3">
-                          <div className="p-2 bg-purple-500/20 rounded-xl">
-                            <Crown className="h-6 w-6 text-purple-400" />
-                          </div>
-                          <span>Gerenciar Agentes</span>
-                        </h2>
-                        <p className="text-slate-400 text-lg">Administre a rede de agentes</p>
                       </div>
-                      <Button
-                        variant="outline"
-                        onClick={fetchAgentsData}
-                        disabled={agentsLoading}
-                        size="sm"
-                        className="border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white transition-all duration-300"
-                      >
-                        <RefreshCw className={`h-4 w-4 mr-2 ${agentsLoading ? "animate-spin" : ""}`} />
-                        Atualizar Agentes
-                      </Button>
-                    </div>
-
-                    {/* Campo de busca para agentes */}
-                    <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                      <CardContent className="p-4">
-                        <div className="flex items-center space-x-4">
-                          <div className="flex-1">
-                            <Input
-                              placeholder="Buscar agente por nome, email ou código..."
-                              value={agentSearchTerm}
-                              onChange={(e) => setAgentSearchTerm(e.target.value)}
-                              className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-purple-500 focus:ring-purple-500/20"
-                            />
-                          </div>
-                          {agentSearchTerm && (
-                            <Button
-                              onClick={() => setAgentSearchTerm("")}
-                              variant="outline"
-                              size="sm"
-                              className="border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white"
-                            >
-                              <XCircle className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* Stats Cards dos Agentes */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardContent className="p-6">
-                          <div className="flex items-center space-x-4">
-                            <div className="p-3 bg-purple-500/20 rounded-xl">
-                              <Crown className="h-8 w-8 text-purple-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-slate-400">Total de Agentes</p>
-                              <p className="text-3xl font-bold text-white">{agents.length}</p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardContent className="p-6">
-                          <div className="flex items-center space-x-4">
-                            <div className="p-3 bg-blue-500/20 rounded-xl">
-                              <Users className="h-8 w-8 text-blue-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-slate-400">Total Afiliados</p>
-                              <p className="text-3xl font-bold text-white">
-                                {agents.reduce((sum, agent) => sum + Number(agent.total_affiliates || 0), 0)}
-                              </p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardContent className="p-6">
-                          <div className="flex items-center space-x-4">
-                            <div className="p-3 bg-emerald-500/20 rounded-xl">
-                              <DollarSign className="h-8 w-8 text-emerald-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-slate-400">Comissão Total</p>
-                              <p className="text-3xl font-bold text-white">
-                                {formatCurrency(
-                                  agents.reduce((sum, agent) => sum + Number(agent.total_commission_earned || 0), 0),
-                                )}
-                              </p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardContent className="p-6">
-                          <div className="flex items-center space-x-4">
-                            <div className="p-3 bg-amber-500/20 rounded-xl">
-                              <Clock className="h-8 w-8 text-amber-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-slate-400">Saques Pendentes</p>
-                              <p className="text-3xl font-bold text-amber-400">{agentWithdrawals.length}</p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-
-                    {/* Tabs dos Agentes */}
-                    <Tabs defaultValue="agents-list" className="space-y-6">
-                      <TabsList className="bg-slate-800/50 border-slate-700 grid grid-cols-3 w-full">
-                        <TabsTrigger
-                          value="agents-list"
-                          className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400"
-                        >
-                          Agentes ({filteredAgents.length})
-                        </TabsTrigger>
-                        <TabsTrigger
-                          value="create-agent"
-                          className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400"
-                        >
-                          Criar Agente
-                        </TabsTrigger>
-                        <TabsTrigger
-                          value="agent-withdrawals"
-                          className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400"
-                        >
-                          Saques Pendentes ({agentWithdrawals.length})
-                        </TabsTrigger>
-                      </TabsList>
-
-                      <TabsContent value="agents-list">
-                        <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                          <CardHeader>
-                            <CardTitle className="text-white text-lg">Lista de Agentes</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            {agentsLoading ? (
-                              <div className="flex items-center justify-center py-12">
-                                <div className="text-center space-y-4">
-                                  <RefreshCw className="h-12 w-12 animate-spin text-amber-500 mx-auto" />
-                                  <span className="text-slate-400 text-lg">Carregando agentes...</span>
-                                </div>
-                              </div>
-                            ) : filteredAgents.length > 0 ? (
-                              <div className="space-y-6">
-                                {filteredAgents.map((agent) => (
-                                  <div
-                                    key={agent.id}
-                                    className="p-6 bg-slate-800/30 rounded-xl border border-slate-700/50"
-                                  >
-                                    <div className="flex flex-col gap-4">
-                                      <div className="flex items-center justify-between">
-                                        <div className="flex-1">
-                                          <div className="flex items-center gap-4 mb-3">
-                                            <h3 className="font-bold text-white text-lg">{agent.user_name}</h3>
-                                            {getStatusBadge(agent.status)}
-                                          </div>
-                                          <p className="text-slate-400 mb-4">{agent.user_email}</p>
-                                        </div>
-                                        <div className="flex gap-2">
-                                          <Button
-                                            onClick={() => {
-                                              setSelectedAgent(agent)
-                                              setNewAgentCommissionRate(agent.commission_rate.toString())
-                                            }}
-                                            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
-                                            size="sm"
-                                          >
-                                            <Settings className="h-4 w-4 mr-1" />
-                                            Editar
-                                          </Button>
-                                          <Button
-                                            onClick={() => toggleAgentStatus(agent.id, agent.status)}
-                                            disabled={actionLoading}
-                                            variant="outline"
-                                            size="sm"
-                                            className={`border-slate-700 ${
-                                              agent.status === "active"
-                                                ? "bg-red-500/20 text-red-400 hover:bg-red-500/30"
-                                                : "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
-                                            }`}
-                                          >
-                                            {agent.status === "active" ? (
-                                              <>
-                                                <XCircle className="h-4 w-4 mr-1" />
-                                                Desativar
-                                              </>
-                                            ) : (
-                                              <>
-                                                <CheckCircle className="h-4 w-4 mr-1" />
-                                                Ativar
-                                              </>
-                                            )}
-                                          </Button>
-                                          <Button
-                                            onClick={() =>
-                                              setDeleteConfirm({ type: "agent", id: agent.id, name: agent.user_name })
-                                            }
-                                            variant="outline"
-                                            size="sm"
-                                            className="border-red-500/50 bg-red-500/10 text-red-400 hover:bg-red-500/20"
-                                          >
-                                            <Trash2 className="h-4 w-4 mr-1" />
-                                            Excluir
-                                          </Button>
-                                        </div>
-                                      </div>
-                                      <div className="grid grid-cols-2 md:grid-cols-5 gap-6 text-sm">
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Código</p>
-                                          <p className="text-purple-400 font-mono font-medium">{agent.agent_code}</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Comissão</p>
-                                          <p className="font-medium text-white">{agent.commission_rate}%</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Afiliados</p>
-                                          <p className="font-medium text-white">{agent.total_affiliates}</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Ganhou</p>
-                                          <p className="text-emerald-400 font-medium">
-                                            {formatCurrency(agent.total_commission_earned)}
-                                          </p>
-                                        </div>
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Saldo Disponível</p>
-                                          <p className="text-blue-400 font-medium">
-                                            {formatCurrency(
-                                              Number(agent.total_commission_earned || 0) -
-                                                Number(agent.total_commission_paid || 0),
-                                            )}
-                                          </p>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="text-center py-12">
-                                <Crown className="h-20 w-20 text-slate-600 mx-auto mb-6" />
-                                <p className="text-slate-400 text-lg mb-4">Nenhum agente cadastrado ainda</p>
-                                <Button
-                                  onClick={fetchAgentsData}
-                                  className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
-                                >
-                                  Carregar Agentes
-                                </Button>
-                              </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      </TabsContent>
-
-                      <TabsContent value="create-agent">
-                        <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                          <CardHeader>
-                            <CardTitle className="text-white text-lg">Criar Novo Agente</CardTitle>
-                          </CardHeader>
-                          <CardContent className="space-y-6">
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                              <div className="space-y-4">
-                                <div>
-                                  <Label htmlFor="agentEmail" className="text-slate-300">
-                                    Email do Usuário
-                                  </Label>
-                                  <Input
-                                    id="agentEmail"
-                                    type="email"
-                                    value={newAgentEmail}
-                                    onChange={(e) => setNewAgentEmail(e.target.value)}
-                                    className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500"
-                                    placeholder="Digite o email do usuário"
-                                  />
-                                </div>
-
-                                <div>
-                                  <Label htmlFor="agentCommission" className="text-slate-300">
-                                    Taxa de Comissão (%)
-                                  </Label>
-                                  <Input
-                                    id="agentCommission"
-                                    type="number"
-                                    min="1"
-                                    max="50"
-                                    step="0.1"
-                                    value={newAgentCommissionRate}
-                                    onChange={(e) => setNewAgentCommissionRate(e.target.value)}
-                                    className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500"
-                                    placeholder="10.0"
-                                  />
-                                </div>
-
-                                <Button
-                                  onClick={createAgent}
-                                  disabled={createAgentLoading || !newAgentEmail}
-                                  className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold h-12"
-                                >
-                                  {createAgentLoading ? (
-                                    <>
-                                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                                      Criando...
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Crown className="h-4 w-4 mr-2" />
-                                      Criar Agente
-                                    </>
-                                  )}
-                                </Button>
-                              </div>
-
-                              <div className="bg-slate-800/30 rounded-lg p-6">
-                                <h4 className="text-purple-400 font-bold mb-4">Informações Importantes</h4>
-                                <ul className="text-gray-300 text-sm space-y-2">
-                                  <li>• O usuário deve estar cadastrado no sistema</li>
-                                  <li>• Agentes podem criar e gerenciar afiliados</li>
-                                  <li>• Taxa padrão de comissão é 10%</li>
-                                  <li>• Agentes acessam o painel em /agente</li>
-                                  <li>• Apenas admins podem criar agentes</li>
-                                </ul>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </TabsContent>
-
-                      <TabsContent value="agent-withdrawals">
-                        <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                          <CardHeader>
-                            <CardTitle className="text-white text-lg">Solicitações de Saque de Agentes</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            {agentWithdrawals.length > 0 ? (
-                              <div className="space-y-6">
-                                {agentWithdrawals.map((withdrawal) => (
-                                  <div
-                                    key={withdrawal.id}
-                                    className="p-6 bg-slate-800/30 rounded-xl border border-slate-700/50"
-                                  >
-                                    <div className="flex flex-col gap-4">
-                                      <div className="flex items-center justify-between">
-                                        <div className="flex-1">
-                                          <div className="flex items-center gap-4 mb-3">
-                                            <h3 className="font-bold text-white text-lg">{withdrawal.agent_name}</h3>
-                                            {getStatusBadge(withdrawal.status)}
-                                          </div>
-                                          <p className="text-slate-400 mb-4">{withdrawal.agent_email}</p>
-                                        </div>
-                                        <div className="flex flex-col gap-2">
-                                          <Button
-                                            onClick={() => processAgentWithdrawal(withdrawal.id, "processing")}
-                                            variant="outline"
-                                            size="sm"
-                                            className="border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white"
-                                          >
-                                            <Settings className="h-4 w-4 mr-2" />
-                                            Processar
-                                          </Button>
-                                          <Button
-                                            onClick={() => processAgentWithdrawal(withdrawal.id, "completed")}
-                                            className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white"
-                                            size="sm"
-                                          >
-                                            <CheckCircle className="h-4 w-4 mr-2" />
-                                            Concluir
-                                          </Button>
-                                          <Button
-                                            onClick={() =>
-                                              processAgentWithdrawal(
-                                                withdrawal.id,
-                                                "cancelled",
-                                                "Cancelado pelo administrador",
-                                              )
-                                            }
-                                            className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
-                                            size="sm"
-                                          >
-                                            <XCircle className="h-4 w-4 mr-2" />
-                                            Cancelar
-                                          </Button>
-                                        </div>
-                                      </div>
-                                      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Valor</p>
-                                          <p className="text-emerald-400 font-bold text-lg">
-                                            {formatCurrency(withdrawal.amount)}
-                                          </p>
-                                        </div>
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Chave PIX</p>
-                                          <p className="font-mono text-white text-sm break-all">{withdrawal.pix_key}</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Tipo</p>
-                                          <p className="uppercase text-white">{withdrawal.pix_type}</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Solicitado em</p>
-                                          <p className="text-white text-sm">{formatDate(withdrawal.created_at)}</p>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="text-center py-12">
-                                <Clock className="h-20 w-20 text-slate-600 mx-auto mb-6" />
-                                <p className="text-slate-400 text-lg">Nenhuma solicitação de saque pendente</p>
-                              </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      </TabsContent>
-                    </Tabs>
+                    ))}
                   </div>
-                )}
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-                {/* Afiliados */}
-                {activeSection === "affiliates" && (
-                  <div className="space-y-8">
-                    {/* Header da seção de afiliados */}
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h2 className="text-3xl font-bold text-white flex items-center space-x-3">
-                          <div className="p-2 bg-emerald-500/20 rounded-xl">
-                            <UserCheck className="h-6 w-6 text-emerald-400" />
-                          </div>
-                          <span>Gerenciar Afiliados</span>
-                        </h2>
-                        <p className="text-slate-400 text-lg">Administre o programa de afiliados</p>
+            {/* Usuários */}
+            <TabsContent value="users" className="space-y-4 md:space-y-8">
+              <div className="mb-4 md:mb-6">
+                <Alert className="border-blue-500/50 bg-blue-500/10">
+                  <Info className="h-4 w-4 text-blue-400" />
+                  <AlertDescription className="text-blue-400 text-sm">
+                    📊 <strong>Dados Limpos:</strong> As estatísticas excluem contas blogger para mostrar apenas dados
+                    reais do negócio.
+                    {stats.users.blogger_count > 0 && (
+                      <span className="ml-2 text-slate-400">
+                        ({stats.users.blogger_count} conta{stats.users.blogger_count > 1 ? "s" : ""} blogger excluída
+                        {stats.users.blogger_count > 1 ? "s" : ""})
+                      </span>
+                    )}
+                  </AlertDescription>
+                </Alert>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
+                <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-3 text-white text-lg">
+                      <div className="p-2 bg-blue-500/20 rounded-lg">
+                        <Users className="h-4 w-4 md:h-5 md:w-5 text-blue-400" />
                       </div>
-                      <Button
-                        variant="outline"
-                        onClick={fetchAffiliatesData}
-                        disabled={affiliatesLoading}
-                        size="sm"
-                        className="border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white transition-all duration-300"
-                      >
-                        <RefreshCw className={`h-4 w-4 mr-2 ${affiliatesLoading ? "animate-spin" : ""}`} />
-                        Atualizar Afiliados
-                      </Button>
-                    </div>
-
-                    {/* Campo de busca para afiliados */}
-                    <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                      <CardContent className="p-4">
-                        <div className="flex items-center space-x-4">
-                          <div className="flex-1">
-                            <Input
-                              placeholder="Buscar afiliado por nome, email ou código..."
-                              value={affiliateSearchTerm}
-                              onChange={(e) => setAffiliateSearchTerm(e.target.value)}
-                              className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:ring-emerald-500/20"
-                            />
-                          </div>
-                          {affiliateSearchTerm && (
-                            <Button
-                              onClick={() => setAffiliateSearchTerm("")}
-                              variant="outline"
-                              size="sm"
-                              className="border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white"
-                            >
-                              <XCircle className="h-4 w-4" />
-                            </Button>
-                          )}
+                      <span>Usuários Regulares</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl md:text-4xl font-bold mb-4 text-white">{stats.users.total.toLocaleString()}</div>
+                    <div className="space-y-3 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Ativos hoje:</span>
+                        <span className="font-medium text-white">{stats.users.active_today}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Novos esta semana:</span>
+                        <span className="font-medium text-emerald-400">+{stats.users.new_this_week}</span>
+                      </div>
+                      {stats.users.blogger_count > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Contas blogger:</span>
+                          <span className="font-medium text-slate-500">{stats.users.blogger_count} (excluídas)</span>
                         </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* Stats Cards dos Afiliados */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardContent className="p-6">
-                          <div className="flex items-center space-x-4">
-                            <div className="p-3 bg-blue-500/20 rounded-xl">
-                              <Users className="h-8 w-8 text-blue-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-slate-400">Total de Afiliados</p>
-                              <p className="text-3xl font-bold text-white">{totalAffiliates}</p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardContent className="p-6">
-                          <div className="flex items-center space-x-4">
-                            <div className="p-3 bg-emerald-500/20 rounded-xl">
-                              <DollarSign className="h-8 w-8 text-emerald-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-slate-400">Comissão Total</p>
-                              <p className="text-3xl font-bold text-white">{formatCurrency(totalCommissionEarned)}</p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardContent className="p-6">
-                          <div className="flex items-center space-x-4">
-                            <div className="p-3 bg-emerald-500/20 rounded-xl">
-                              <CheckCircle className="h-8 w-8 text-emerald-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-slate-400">Comissão Paga</p>
-                              <p className="text-3xl font-bold text-emerald-400">{formatCurrency(totalCommissionPaid)}</p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardContent className="p-6">
-                          <div className="flex items-center space-x-4">
-                            <div className="p-3 bg-amber-500/20 rounded-xl">
-                              <Clock className="h-8 w-8 text-amber-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-slate-400">Pendente</p>
-                              <p className="text-3xl font-bold text-amber-400">{formatCurrency(pendingCommission)}</p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
+                      )}
                     </div>
+                  </CardContent>
+                </Card>
 
-                    {/* Tabs dos Afiliados */}
-                    <Tabs defaultValue="affiliates-list" className="space-y-6">
-                      <TabsList className="bg-slate-800/50 border-slate-700 grid grid-cols-2 w-full">
-                        <TabsTrigger
-                          value="affiliates-list"
-                          className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400"
-                        >
-                          Afiliados ({filteredAffiliates.length})
-                        </TabsTrigger>
-                        <TabsTrigger
-                          value="withdrawals-list"
-                          className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400"
-                        >
-                          Saques Pendentes ({withdrawals.length})
-                        </TabsTrigger>
-                      </TabsList>
+                <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="text-white text-lg">Taxa de Crescimento</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl md:text-3xl font-bold text-emerald-400 mb-2">
+                      {stats.users.total > 0
+                        ? ((stats.users.new_this_week / stats.users.total) * 100).toFixed(1)
+                        : "0.0"}
+                      %
+                    </div>
+                    <p className="text-sm text-slate-400">Crescimento semanal</p>
+                  </CardContent>
+                </Card>
 
-                      <TabsContent value="affiliates-list">
-                        <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                          <CardHeader>
-                            <CardTitle className="text-white text-lg">Lista de Afiliados</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            {affiliatesLoading ? (
-                              <div className="flex items-center justify-center py-12">
-                                <div className="text-center space-y-4">
-                                  <RefreshCw className="h-12 w-12 animate-spin text-amber-500 mx-auto" />
-                                  <span className="text-slate-400 text-lg">Carregando afiliados...</span>
-                                </div>
-                              </div>
-                            ) : filteredAffiliates.length > 0 ? (
-                              <div className="space-y-6">
-                                {filteredAffiliates.map((affiliate) => (
-                                  <div
-                                    key={affiliate.id}
-                                    className="p-6 bg-slate-800/30 rounded-xl border border-slate-700/50"
-                                  >
-                                    <div className="flex flex-col gap-4">
-                                      <div className="flex items-center justify-between">
-                                        <div className="flex-1">
-                                          <div className="flex items-center gap-4 mb-3">
-                                            <h3 className="font-bold text-white text-lg">{affiliate.user_name}</h3>
-                                            {getStatusBadge(affiliate.status)}
-                                          </div>
-                                          <p className="text-slate-400 mb-4">{affiliate.user_email}</p>
-                                        </div>
-                                        <div className="flex gap-2">
-                                          <Button
-                                            onClick={() => {
-                                              setSelectedAffiliate(affiliate)
-                                              setNewCommissionRate(affiliate.commission_rate.toString())
-                                            }}
-                                            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
-                                            size="sm"
-                                          >
-                                            <Settings className="h-4 w-4 mr-1" />
-                                            Editar Taxa
-                                          </Button>
-                                          <Button
-                                            onClick={() => setSelectedAffiliateForPasswordChange(affiliate)}
-                                            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
-                                            size="sm"
-                                          >
-                                            <KeyRound className="h-4 w-4 mr-1" />
-                                            Alterar Senha
-                                          </Button>
-                                          <Button
-                                            onClick={() => toggleAffiliateStatus(affiliate.id, affiliate.status)}
-                                            disabled={actionLoading}
-                                            variant="outline"
-                                            size="sm"
-                                            className={`border-slate-700 ${
-                                              affiliate.status === "active"
-                                                ? "bg-red-500/20 text-red-400 hover:bg-red-500/30"
-                                                : "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
-                                            }`}
-                                          >
-                                            {affiliate.status === "active" ? (
-                                              <>
-                                                <XCircle className="h-4 w-4 mr-1" />
-                                                Desativar
-                                              </>
-                                            ) : (
-                                              <>
-                                                <CheckCircle className="h-4 w-4 mr-1" />
-                                                Ativar
-                                              </>
-                                            )}
-                                          </Button>
-                                          <Button
-                                            onClick={() =>
-                                              setDeleteConfirm({
-                                                type: "affiliate",
-                                                id: affiliate.id,
-                                                name: affiliate.user_name,
-                                              })
-                                            }
-                                            variant="outline"
-                                            size="sm"
-                                            className="border-red-500/50 bg-red-500/10 text-red-400 hover:bg-red-500/20"
-                                          >
-                                            <Trash2 className="h-4 w-4 mr-1" />
-                                            Excluir
-                                          </Button>
-                                        </div>
+                <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="text-white text-lg">Engajamento</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl md:text-3xl font-bold text-blue-400 mb-2">
+                      {stats.users.total > 0
+                        ? ((stats.users.active_today / stats.users.total) * 100).toFixed(1)
+                        : "0.0"}
+                      %
+                    </div>
+                    <p className="text-sm text-slate-400">Usuários ativos hoje</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            {/* Jogos */}
+            <TabsContent value="games" className="space-y-4 md:space-y-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                  <CardContent className="p-4 md:p-6">
+                    <div className="flex items-center space-x-3 md:space-x-4">
+                      <div className="p-2 md:p-3 bg-violet-500/20 rounded-xl">
+                        <Gamepad2 className="h-5 w-5 md:h-6 md:w-6 text-violet-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs md:text-sm text-slate-400">Total de Jogadas</p>
+                        <p className="text-xl md:text-2xl font-bold text-white">{stats.games.total_plays.toLocaleString()}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                  <CardContent className="p-4 md:p-6">
+                    <div className="flex items-center space-x-3 md:space-x-4">
+                      <div className="p-2 md:p-3 bg-blue-500/20 rounded-xl">
+                        <DollarSign className="h-5 w-5 md:h-6 md:w-6 text-blue-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs md:text-sm text-slate-400">Total Apostado</p>
+                        <p className="text-xl md:text-2xl font-bold text-white">{formatCurrency(stats.games.total_spent)}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                  <CardContent className="p-4 md:p-6">
+                    <div className="flex items-center space-x-3 md:space-x-4">
+                      <div className="p-2 md:p-3 bg-amber-500/20 rounded-xl">
+                        <Trophy className="h-5 w-5 md:h-6 md:w-6 text-amber-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs md:text-sm text-slate-400">Total Ganho</p>
+                        <p className="text-xl md:text-2xl font-bold text-amber-400">{formatCurrency(stats.games.total_won)}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                  <CardContent className="p-4 md:p-6">
+                    <div className="flex items-center space-x-3 md:space-x-4">
+                      <div className="p-2 md:p-3 bg-emerald-500/20 rounded-xl">
+                        <Target className="h-5 w-5 md:h-6 md:w-6 text-emerald-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs md:text-sm text-slate-400">Margem de Lucro</p>
+                        <p className="text-xl md:text-2xl font-bold text-emerald-400">
+                          {formatPercent(stats.games.profit_margin)}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Breakdown por jogo */}
+              <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-3 text-white text-lg">
+                    <div className="p-2 bg-amber-500/20 rounded-lg">
+                      <BarChart3 className="h-4 w-4 md:h-5 md:w-5 text-amber-400" />
+                    </div>
+                    <span>Performance por Jogo</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4 md:space-y-6">
+                    {Object.entries(stats.games.games_breakdown).map(([gameName, gameStats]) => (
+                      <div key={gameName} className="p-4 md:p-6 bg-slate-800/30 rounded-xl border border-slate-700/50">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-3">
+                          <h3 className="font-semibold text-lg md:text-xl text-white">{gameName}</h3>
+                          <Badge className="bg-slate-700/50 text-slate-300 border-slate-600 px-3 py-1 text-xs w-fit">
+                            {gameStats.plays} jogadas
+                          </Badge>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-sm">
+                          <div>
+                            <p className="text-slate-400 font-medium mb-1">Apostado</p>
+                            <p className="font-bold text-blue-400 text-base md:text-lg">{formatCurrency(gameStats.spent)}</p>
+                          </div>
+                          <div>
+                            <p className="text-slate-400 font-medium mb-1">Ganho</p>
+                            <p className="font-bold text-amber-400 text-base md:text-lg">{formatCurrency(gameStats.won)}</p>
+                          </div>
+                          <div>
+                            <p className="text-slate-400 font-medium mb-1">Lucro</p>
+                            <p className="font-bold text-emerald-400 text-base md:text-lg">{formatCurrency(gameStats.profit)}</p>
+                          </div>
+                          <div>
+                            <p className="text-slate-400 font-medium mb-1">Margem</p>
+                            <p className="font-bold text-white text-base md:text-lg">
+                              {formatPercent((gameStats.profit / gameStats.spent) * 100)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Financeiro */}
+            <TabsContent value="financial" className="space-y-4 md:space-y-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="text-emerald-400 text-lg">Saldo da Plataforma</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl md:text-4xl font-bold text-emerald-400 mb-2">
+                      {formatCurrency(stats.financial.platform_balance)}
+                    </div>
+                    <p className="text-sm text-slate-400">Saldo total da plataforma</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="text-blue-400 text-lg">Saldo Disponível</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl md:text-4xl font-bold text-blue-400 mb-2">
+                      {formatCurrency(stats.financial.available_balance)}
+                    </div>
+                    <p className="text-sm text-slate-400">Disponível para operações</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="text-amber-400 text-lg">Saldo HorsePay</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl md:text-4xl font-bold text-amber-400 mb-2">
+                      {formatCurrency(stats.financial.horsepay_balance)}
+                    </div>
+                    <p className="text-sm text-slate-400">
+                      {stats.financial.horsepay_error ? "Erro na consulta" : "Saldo real na carteira"}
+                    </p>
+                    {stats.financial.horsepay_error && (
+                      <p className="text-xs text-red-400 mt-1">{stats.financial.horsepay_error}</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="text-red-400 text-lg">Saques Pendentes</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl md:text-4xl font-bold text-red-400 mb-2">
+                      {formatCurrency(stats.financial.pending_withdraws)}
+                    </div>
+                    <p className="text-sm text-slate-400">Aguardando processamento</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="text-violet-400 text-lg">Receita Diária</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl md:text-3xl font-bold text-violet-400 mb-2">
+                      {formatCurrency(stats.financial.daily_revenue)}
+                    </div>
+                    <p className="text-sm text-slate-400">Receita de hoje</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="text-indigo-400 text-lg">Receita Semanal</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl md:text-3xl font-bold text-indigo-400 mb-2">
+                      {formatCurrency(stats.financial.weekly_revenue)}
+                    </div>
+                    <p className="text-sm text-slate-400">Receita desta semana</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="text-emerald-400 text-lg">Receita Mensal</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl md:text-3xl font-bold text-emerald-400 mb-2">
+                      {formatCurrency(stats.financial.monthly_revenue)}
+                    </div>
+                    <p className="text-sm text-slate-400">Receita deste mês</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            {/* Gerentes */}
+            <TabsContent value="managers" className="space-y-4 md:space-y-8">
+              <div className="space-y-4 md:space-y-8">
+                {/* Header da seção de gerentes */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-2xl md:text-3xl font-bold text-white flex items-center space-x-3">
+                      <div className="p-2 bg-yellow-500/20 rounded-xl">
+                        <Star className="h-5 w-5 md:h-6 md:w-6 text-yellow-400" />
+                      </div>
+                      <span>Gerenciar Gerentes</span>
+                    </h2>
+                    <p className="text-slate-400 text-sm md:text-lg">Administre a rede de gerentes</p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={fetchManagersData}
+                    disabled={managersLoading}
+                    size="sm"
+                    className="border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white transition-all duration-300"
+                  >
+                    <RefreshCw className={`h-4 w-4 mr-2 ${managersLoading ? "animate-spin" : ""}`} />
+                    <span className="hidden md:inline">Atualizar Gerentes</span>
+                    <span className="md:hidden">Atualizar</span>
+                  </Button>
+                </div>
+
+                {/* Campo de busca para gerentes */}
+                <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                  <CardContent className="p-4">
+                    <div className="flex items-center space-x-4">
+                      <div className="flex-1">
+                        <Input
+                          placeholder="Buscar gerente por nome, email ou código..."
+                          value={managerSearchTerm}
+                          onChange={(e) => setManagerSearchTerm(e.target.value)}
+                          className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-yellow-500 focus:ring-yellow-500/20"
+                        />
+                      </div>
+                      {managerSearchTerm && (
+                        <Button
+                          onClick={() => setManagerSearchTerm("")}
+                          variant="outline"
+                          size="sm"
+                          className="border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white"
+                        >
+                          <XCircle className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Stats Cards dos Gerentes */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                  <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                    <CardContent className="p-4 md:p-6">
+                      <div className="flex items-center space-x-3 md:space-x-4">
+                        <div className="p-2 md:p-3 bg-yellow-500/20 rounded-xl">
+                          <Star className="h-6 w-6 md:h-8 md:w-8 text-yellow-400" />
+                        </div>
+                        <div>
+                          <p className="text-xs md:text-sm font-medium text-slate-400">Total de Gerentes</p>
+                          <p className="text-2xl md:text-3xl font-bold text-white">{managers.length}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                    <CardContent className="p-4 md:p-6">
+                      <div className="flex items-center space-x-3 md:space-x-4">
+                        <div className="p-2 md:p-3 bg-purple-500/20 rounded-xl">
+                          <Crown className="h-6 w-6 md:h-8 md:w-8 text-purple-400" />
+                        </div>
+                        <div>
+                          <p className="text-xs md:text-sm font-medium text-slate-400">Total Agentes</p>
+                          <p className="text-2xl md:text-3xl font-bold text-white">
+                            {managers.reduce((sum, manager) => sum + Number(manager.total_agents || 0), 0)}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                    <CardContent className="p-4 md:p-6">
+                      <div className="flex items-center space-x-3 md:space-x-4">
+                        <div className="p-2 md:p-3 bg-emerald-500/20 rounded-xl">
+                          <DollarSign className="h-6 w-6 md:h-8 md:w-8 text-emerald-400" />
+                        </div>
+                        <div>
+                          <p className="text-xs md:text-sm font-medium text-slate-400">Comissão Total</p>
+                          <p className="text-2xl md:text-3xl font-bold text-white">
+                            {formatCurrency(
+                              managers.reduce((sum, manager) => sum + Number(manager.total_commission_earned || 0), 0),
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                    <CardContent className="p-4 md:p-6">
+                      <div className="flex items-center space-x-3 md:space-x-4">
+                        <div className="p-2 md:p-3 bg-amber-500/20 rounded-xl">
+                          <Clock className="h-6 w-6 md:h-8 md:w-8 text-amber-400" />
+                        </div>
+                        <div>
+                          <p className="text-xs md:text-sm font-medium text-slate-400">Saques Pendentes</p>
+                          <p className="text-2xl md:text-3xl font-bold text-amber-400">{managerWithdrawals.length}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Tabs dos Gerentes */}
+                <Tabs defaultValue="managers-list" className="space-y-4 md:space-y-6">
+                  <TabsList className="bg-slate-800/50 border-slate-700 grid grid-cols-3 w-full">
+                    <TabsTrigger
+                      value="managers-list"
+                      className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400 text-xs md:text-sm"
+                    >
+                      <span className="md:hidden">Lista ({filteredManagers.length})</span>
+                      <span className="hidden md:inline">Gerentes ({filteredManagers.length})</span>
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="create-manager"
+                      className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400 text-xs md:text-sm"
+                    >
+                      <span className="md:hidden">Criar</span>
+                      <span className="hidden md:inline">Criar Gerente</span>
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="manager-withdrawals"
+                      className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400 text-xs md:text-sm"
+                    >
+                      <span className="md:hidden">Saques ({managerWithdrawals.length})</span>
+                      <span className="hidden md:inline">Saques Pendentes ({managerWithdrawals.length})</span>
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="managers-list">
+                    <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                      <CardHeader>
+                        <CardTitle className="text-white text-lg">Lista de Gerentes</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {managersLoading ? (
+                          <div className="flex items-center justify-center py-12">
+                            <div className="text-center space-y-4">
+                              <RefreshCw className="h-12 w-12 animate-spin text-amber-500 mx-auto" />
+                              <span className="text-slate-400 text-lg">Carregando gerentes...</span>
+                            </div>
+                          </div>
+                        ) : filteredManagers.length > 0 ? (
+                          <div className="space-y-4 md:space-y-6">
+                            {filteredManagers.map((manager) => (
+                              <div
+                                key={manager.id}
+                                className="p-4 md:p-6 bg-slate-800/30 rounded-xl border border-slate-700/50"
+                              >
+                                <div className="flex flex-col gap-4">
+                                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                                    <div className="flex-1">
+                                      <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-3">
+                                        <h3 className="font-bold text-white text-lg">{manager.user_name}</h3>
+                                        {getStatusBadge(manager.status)}
                                       </div>
-                                      <div className="grid grid-cols-2 md:grid-cols-5 gap-6 text-sm">
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Código</p>
-                                          <p className="text-emerald-400 font-mono font-medium">
-                                            {affiliate.affiliate_code}
-                                          </p>
-                                        </div>
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Comissão</p>
-                                          <p className="font-medium text-white">{affiliate.commission_rate}%</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Indicações</p>
-                                          <p className="font-medium text-white">{affiliate.total_referrals}</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Ganhou</p>
-                                          <p className="text-emerald-400 font-medium">
-                                            {formatCurrency(affiliate.total_commission_earned)}
-                                          </p>
-                                        </div>
-                                        <div>
-                                          <p className="text-slate-400 mb-1">Saldo Disponível</p>
-                                          <p className="text-blue-400 font-medium">
-                                            {formatCurrency(
-                                              Number(affiliate.total_commission_earned || 0) -
-                                                Number(affiliate.total_commission_paid || 0),
+                                      <p className="text-slate-400 mb-4 text-sm md:text-base">{manager.user_email}</p>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                      <Button
+                                        onClick={() => {
+                                          setSelectedManager(manager)
+                                          setNewManagerCommissionRate(manager.commission_rate.toString())
+                                        }}
+                                        className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
+                                        size="sm"
+                                      >
+                                        <Settings className="h-4 w-4 mr-1" />
+                                        <span className="hidden md:inline">Editar</span>
+                                      </Button>
+                                      <Button
+                                        onClick={() => toggleManagerStatus(manager.id, manager.status)}
+                                        disabled={actionLoading}
+                                        variant="outline"
+                                        size="sm"
+                                        className={`border-slate-700 ${
+                                          manager.status === "active"
+                                            ? "bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                                            : "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                                        }`}
+                                      >
+                                        {manager.status === "active" ? (
+                                          <>
+                                            <XCircle className="h-4 w-4 mr-1" />
+                                            <span className="hidden md:inline">Desativar</span>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <CheckCircle className="h-4 w-4 mr-1" />
+                                            <span className="hidden md:inline">Ativar</span>
+                                          </>
+                                        )}
+                                      </Button>
+                                      <Button
+                                        onClick={() =>
+                                          setDeleteConfirm({ type: "manager", id: manager.id, name: manager.user_name })
+                                        }
+                                        variant="outline"
+                                        size="sm"
+                                        className="border-red-500/50 bg-red-500/10 text-red-400 hover:bg-red-500/20"
+                                      >
+                                        <Trash2 className="h-4 w-4 mr-1" />
+                                        <span className="hidden md:inline">Excluir</span>
+                                      </Button>
+                                    </div>
+                                  </div>
+                                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6 text-sm">
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Código</p>
+                                      <p className="text-yellow-400 font-mono font-medium text-xs md:text-sm">{manager.manager_code}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Comissão</p>
+                                      <p className="font-medium text-white">{manager.commission_rate}%</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Agentes</p>
+                                      <p className="font-medium text-white">{manager.total_agents}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Ganhou</p>
+                                      <p className="text-emerald-400 font-medium text-xs md:text-sm">
+                                        {formatCurrency(manager.total_commission_earned)}
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Saldo Disponível</p>
+                                      <p className="text-blue-400 font-medium text-xs md:text-sm">
+                                        {formatCurrency(
+                                          Number(manager.total_commission_earned || 0) -
+                                            Number(manager.total_commission_paid || 0),
                                         )}
                                       </p>
                                     </div>
@@ -3145,7 +2186,882 @@ export default function AdminConfigPage() {
                           </div>
                         ) : (
                           <div className="text-center py-12">
-                            <Users className="h-20 w-20 text-slate-600 mx-auto mb-6" />
+                            <Star className="h-16 w-16 md:h-20 md:w-20 text-slate-600 mx-auto mb-6" />
+                            <p className="text-slate-400 text-lg mb-4">Nenhum gerente cadastrado ainda</p>
+                            <Button
+                              onClick={fetchManagersData}
+                              className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
+                            >
+                              Carregar Gerentes
+                            </Button>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="create-manager">
+                    <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                      <CardHeader>
+                        <CardTitle className="text-white text-lg">Criar Novo Gerente</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                          <div className="space-y-4">
+                            <div>
+                              <Label htmlFor="managerEmail" className="text-slate-300">
+                                Email do Usuário
+                              </Label>
+                              <Input
+                                id="managerEmail"
+                                type="email"
+                                value={newManagerEmail}
+                                onChange={(e) => setNewManagerEmail(e.target.value)}
+                                className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500"
+                                placeholder="Digite o email do usuário"
+                              />
+                            </div>
+
+                            <div>
+                              <Label htmlFor="managerCommission" className="text-slate-300">
+                                Taxa de Comissão (%)
+                              </Label>
+                              <Input
+                                id="managerCommission"
+                                type="number"
+                                min="1"
+                                max="20"
+                                step="0.1"
+                                value={newManagerCommissionRate}
+                                onChange={(e) => setNewManagerCommissionRate(e.target.value)}
+                                className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500"
+                                placeholder="5.0"
+                              />
+                            </div>
+
+                            <Button
+                              onClick={createManager}
+                              disabled={createManagerLoading || !newManagerEmail}
+                              className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold h-12"
+                            >
+                              {createManagerLoading ? (
+                                <>
+                                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                                  Criando...
+                                </>
+                              ) : (
+                                <>
+                                  <Star className="h-4 w-4 mr-2" />
+                                  Criar Gerente
+                                </>
+                              )}
+                            </Button>
+                          </div>
+
+                          <div className="bg-slate-800/30 rounded-lg p-4 md:p-6">
+                            <h4 className="text-yellow-400 font-bold mb-4">Informações Importantes</h4>
+                            <ul className="text-gray-300 text-sm space-y-2">
+                              <li>• O usuário deve estar cadastrado no sistema</li>
+                              <li>• Gerentes podem criar e gerenciar agentes</li>
+                              <li>• Taxa padrão de comissão é 5%</li>
+                              <li>• Gerentes acessam o painel em /gerente</li>
+                              <li>• Apenas admins podem criar gerentes</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="manager-withdrawals">
+                    <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                      <CardHeader>
+                        <CardTitle className="text-white text-lg">Solicitações de Saque de Gerentes</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {managerWithdrawals.length > 0 ? (
+                          <div className="space-y-4 md:space-y-6">
+                            {managerWithdrawals.map((withdrawal) => (
+                              <div
+                                key={withdrawal.id}
+                                className="p-4 md:p-6 bg-slate-800/30 rounded-xl border border-slate-700/50"
+                              >
+                                <div className="flex flex-col gap-4">
+                                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                                    <div className="flex-1">
+                                      <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-3">
+                                        <h3 className="font-bold text-white text-lg">{withdrawal.manager_name}</h3>
+                                        {getStatusBadge(withdrawal.status)}
+                                      </div>
+                                      <p className="text-slate-400 mb-4 text-sm md:text-base">{withdrawal.manager_email}</p>
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                      <Button
+                                        onClick={() => processManagerWithdrawal(withdrawal.id, "processing")}
+                                        variant="outline"
+                                        size="sm"
+                                        className="border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white"
+                                      >
+                                        <Settings className="h-4 w-4 mr-2" />
+                                        Processar
+                                      </Button>
+                                      <Button
+                                        onClick={() => processManagerWithdrawal(withdrawal.id, "completed")}
+                                        className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white"
+                                        size="sm"
+                                      >
+                                        <CheckCircle className="h-4 w-4 mr-2" />
+                                        Concluir
+                                      </Button>
+                                      <Button
+                                        onClick={() =>
+                                          processManagerWithdrawal(
+                                            withdrawal.id,
+                                            "cancelled",
+                                            "Cancelado pelo administrador",
+                                          )
+                                        }
+                                        className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
+                                        size="sm"
+                                      >
+                                        <XCircle className="h-4 w-4 mr-2" />
+                                        Cancelar
+                                      </Button>
+                                    </div>
+                                  </div>
+                                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-sm">
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Valor</p>
+                                      <p className="text-emerald-400 font-bold text-base md:text-lg">
+                                        {formatCurrency(withdrawal.amount)}
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Chave PIX</p>
+                                      <p className="font-mono text-white text-xs md:text-sm break-all">{withdrawal.pix_key}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Tipo</p>
+                                      <p className="uppercase text-white">{withdrawal.pix_type}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Solicitado em</p>
+                                      <p className="text-white text-xs md:text-sm">{formatDate(withdrawal.created_at)}</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-center py-12">
+                            <Clock className="h-16 w-16 md:h-20 md:w-20 text-slate-600 mx-auto mb-6" />
+                            <p className="text-slate-400 text-lg">Nenhuma solicitação de saque pendente</p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                </Tabs>
+              </div>
+            </TabsContent>
+
+            {/* Agentes */}
+            <TabsContent value="agents" className="space-y-4 md:space-y-8">
+              <div className="space-y-4 md:space-y-8">
+                {/* Header da seção de agentes */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-2xl md:text-3xl font-bold text-white flex items-center space-x-3">
+                      <div className="p-2 bg-purple-500/20 rounded-xl">
+                        <Crown className="h-5 w-5 md:h-6 md:w-6 text-purple-400" />
+                      </div>
+                      <span>Gerenciar Agentes</span>
+                    </h2>
+                    <p className="text-slate-400 text-sm md:text-lg">Administre a rede de agentes</p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={fetchAgentsData}
+                    disabled={agentsLoading}
+                    size="sm"
+                    className="border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white transition-all duration-300"
+                  >
+                    <RefreshCw className={`h-4 w-4 mr-2 ${agentsLoading ? "animate-spin" : ""}`} />
+                    <span className="hidden md:inline">Atualizar Agentes</span>
+                    <span className="md:hidden">Atualizar</span>
+                  </Button>
+                </div>
+
+                {/* Campo de busca para agentes */}
+                <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                  <CardContent className="p-4">
+                    <div className="flex items-center space-x-4">
+                      <div className="flex-1">
+                        <Input
+                          placeholder="Buscar agente por nome, email ou código..."
+                          value={agentSearchTerm}
+                          onChange={(e) => setAgentSearchTerm(e.target.value)}
+                          className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-purple-500 focus:ring-purple-500/20"
+                        />
+                      </div>
+                      {agentSearchTerm && (
+                        <Button
+                          onClick={() => setAgentSearchTerm("")}
+                          variant="outline"
+                          size="sm"
+                          className="border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white"
+                        >
+                          <XCircle className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Stats Cards dos Agentes */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                  <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                    <CardContent className="p-4 md:p-6">
+                      <div className="flex items-center space-x-3 md:space-x-4">
+                        <div className="p-2 md:p-3 bg-purple-500/20 rounded-xl">
+                          <Crown className="h-6 w-6 md:h-8 md:w-8 text-purple-400" />
+                        </div>
+                        <div>
+                          <p className="text-xs md:text-sm font-medium text-slate-400">Total de Agentes</p>
+                          <p className="text-2xl md:text-3xl font-bold text-white">{agents.length}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                    <CardContent className="p-4 md:p-6">
+                      <div className="flex items-center space-x-3 md:space-x-4">
+                        <div className="p-2 md:p-3 bg-blue-500/20 rounded-xl">
+                          <Users className="h-6 w-6 md:h-8 md:w-8 text-blue-400" />
+                        </div>
+                        <div>
+                          <p className="text-xs md:text-sm font-medium text-slate-400">Total Afiliados</p>
+                          <p className="text-2xl md:text-3xl font-bold text-white">
+                            {agents.reduce((sum, agent) => sum + Number(agent.total_affiliates || 0), 0)}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                    <CardContent className="p-4 md:p-6">
+                      <div className="flex items-center space-x-3 md:space-x-4">
+                        <div className="p-2 md:p-3 bg-emerald-500/20 rounded-xl">
+                          <DollarSign className="h-6 w-6 md:h-8 md:w-8 text-emerald-400" />
+                        </div>
+                        <div>
+                          <p className="text-xs md:text-sm font-medium text-slate-400">Comissão Total</p>
+                          <p className="text-2xl md:text-3xl font-bold text-white">
+                            {formatCurrency(
+                              agents.reduce((sum, agent) => sum + Number(agent.total_commission_earned || 0), 0),
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                    <CardContent className="p-4 md:p-6">
+                      <div className="flex items-center space-x-3 md:space-x-4">
+                        <div className="p-2 md:p-3 bg-amber-500/20 rounded-xl">
+                          <Clock className="h-6 w-6 md:h-8 md:w-8 text-amber-400" />
+                        </div>
+                        <div>
+                          <p className="text-xs md:text-sm font-medium text-slate-400">Saques Pendentes</p>
+                          <p className="text-2xl md:text-3xl font-bold text-amber-400">{agentWithdrawals.length}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Tabs dos Agentes */}
+                <Tabs defaultValue="agents-list" className="space-y-4 md:space-y-6">
+                  <TabsList className="bg-slate-800/50 border-slate-700 grid grid-cols-3 w-full">
+                    <TabsTrigger
+                      value="agents-list"
+                      className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400 text-xs md:text-sm"
+                    >
+                      <span className="md:hidden">Lista ({filteredAgents.length})</span>
+                      <span className="hidden md:inline">Agentes ({filteredAgents.length})</span>
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="create-agent"
+                      className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400 text-xs md:text-sm"
+                    >
+                      <span className="md:hidden">Criar</span>
+                      <span className="hidden md:inline">Criar Agente</span>
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="agent-withdrawals"
+                      className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400 text-xs md:text-sm"
+                    >
+                      <span className="md:hidden">Saques ({agentWithdrawals.length})</span>
+                      <span className="hidden md:inline">Saques Pendentes ({agentWithdrawals.length})</span>
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="agents-list">
+                    <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                      <CardHeader>
+                        <CardTitle className="text-white text-lg">Lista de Agentes</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {agentsLoading ? (
+                          <div className="flex items-center justify-center py-12">
+                            <div className="text-center space-y-4">
+                              <RefreshCw className="h-12 w-12 animate-spin text-amber-500 mx-auto" />
+                              <span className="text-slate-400 text-lg">Carregando agentes...</span>
+                            </div>
+                          </div>
+                        ) : filteredAgents.length > 0 ? (
+                          <div className="space-y-4 md:space-y-6">
+                            {filteredAgents.map((agent) => (
+                              <div
+                                key={agent.id}
+                                className="p-4 md:p-6 bg-slate-800/30 rounded-xl border border-slate-700/50"
+                              >
+                                <div className="flex flex-col gap-4">
+                                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                                    <div className="flex-1">
+                                      <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-3">
+                                        <h3 className="font-bold text-white text-lg">{agent.user_name}</h3>
+                                        {getStatusBadge(agent.status)}
+                                      </div>
+                                      <p className="text-slate-400 mb-4 text-sm md:text-base">{agent.user_email}</p>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                      <Button
+                                        onClick={() => {
+                                          setSelectedAgent(agent)
+                                          setNewAgentCommissionRate(agent.commission_rate.toString())
+                                        }}
+                                        className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
+                                        size="sm"
+                                      >
+                                        <Settings className="h-4 w-4 mr-1" />
+                                        <span className="hidden md:inline">Editar</span>
+                                      </Button>
+                                      <Button
+                                        onClick={() => toggleAgentStatus(agent.id, agent.status)}
+                                        disabled={actionLoading}
+                                        variant="outline"
+                                        size="sm"
+                                        className={`border-slate-700 ${
+                                          agent.status === "active"
+                                            ? "bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                                            : "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                                        }`}
+                                      >
+                                        {agent.status === "active" ? (
+                                          <>
+                                            <XCircle className="h-4 w-4 mr-1" />
+                                            <span className="hidden md:inline">Desativar</span>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <CheckCircle className="h-4 w-4 mr-1" />
+                                            <span className="hidden md:inline">Ativar</span>
+                                          </>
+                                        )}
+                                      </Button>
+                                      <Button
+                                        onClick={() =>
+                                          setDeleteConfirm({ type: "agent", id: agent.id, name: agent.user_name })
+                                        }
+                                        variant="outline"
+                                        size="sm"
+                                        className="border-red-500/50 bg-red-500/10 text-red-400 hover:bg-red-500/20"
+                                      >
+                                        <Trash2 className="h-4 w-4 mr-1" />
+                                        <span className="hidden md:inline">Excluir</span>
+                                      </Button>
+                                    </div>
+                                  </div>
+                                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6 text-sm">
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Código</p>
+                                      <p className="text-purple-400 font-mono font-medium text-xs md:text-sm">{agent.agent_code}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Comissão</p>
+                                      <p className="font-medium text-white">{agent.commission_rate}%</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Afiliados</p>
+                                      <p className="font-medium text-white">{agent.total_affiliates}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Ganhou</p>
+                                      <p className="text-emerald-400 font-medium text-xs md:text-sm">
+                                        {formatCurrency(agent.total_commission_earned)}
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Saldo Disponível</p>
+                                      <p className="text-blue-400 font-medium text-xs md:text-sm">
+                                        {formatCurrency(
+                                          Number(agent.total_commission_earned || 0) -
+                                            Number(agent.total_commission_paid || 0),
+                                        )}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-center py-12">
+                            <Crown className="h-16 w-16 md:h-20 md:w-20 text-slate-600 mx-auto mb-6" />
+                            <p className="text-slate-400 text-lg mb-4">Nenhum agente cadastrado ainda</p>
+                            <Button
+                              onClick={fetchAgentsData}
+                              className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
+                            >
+                              Carregar Agentes
+                            </Button>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="create-agent">
+                    <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                      <CardHeader>
+                        <CardTitle className="text-white text-lg">Criar Novo Agente</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                          <div className="space-y-4">
+                            <div>
+                              <Label htmlFor="agentEmail" className="text-slate-300">
+                                Email do Usuário
+                              </Label>
+                              <Input
+                                id="agentEmail"
+                                type="email"
+                                value={newAgentEmail}
+                                onChange={(e) => setNewAgentEmail(e.target.value)}
+                                className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500"
+                                placeholder="Digite o email do usuário"
+                              />
+                            </div>
+
+                            <div>
+                              <Label htmlFor="agentCommission" className="text-slate-300">
+                                Taxa de Comissão (%)
+                              </Label>
+                              <Input
+                                id="agentCommission"
+                                type="number"
+                                min="1"
+                                max="50"
+                                step="0.1"
+                                value={newAgentCommissionRate}
+                                onChange={(e) => setNewAgentCommissionRate(e.target.value)}
+                                className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500"
+                                placeholder="10.0"
+                              />
+                            </div>
+
+                            <Button
+                              onClick={createAgent}
+                              disabled={createAgentLoading || !newAgentEmail}
+                              className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold h-12"
+                            >
+                              {createAgentLoading ? (
+                                <>
+                                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                                  Criando...
+                                </>
+                              ) : (
+                                <>
+                                  <Crown className="h-4 w-4 mr-2" />
+                                  Criar Agente
+                                </>
+                              )}
+                            </Button>
+                          </div>
+
+                          <div className="bg-slate-800/30 rounded-lg p-4 md:p-6">
+                            <h4 className="text-purple-400 font-bold mb-4">Informações Importantes</h4>
+                            <ul className="text-gray-300 text-sm space-y-2">
+                              <li>• O usuário deve estar cadastrado no sistema</li>
+                              <li>• Agentes podem criar e gerenciar afiliados</li>
+                              <li>• Taxa padrão de comissão é 10%</li>
+                              <li>• Agentes acessam o painel em /agente</li>
+                              <li>• Apenas admins podem criar agentes</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="agent-withdrawals">
+                    <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                      <CardHeader>
+                        <CardTitle className="text-white text-lg">Solicitações de Saque de Agentes</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {agentWithdrawals.length > 0 ? (
+                          <div className="space-y-4 md:space-y-6">
+                            {agentWithdrawals.map((withdrawal) => (
+                              <div
+                                key={withdrawal.id}
+                                className="p-4 md:p-6 bg-slate-800/30 rounded-xl border border-slate-700/50"
+                              >
+                                <div className="flex flex-col gap-4">
+                                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                                    <div className="flex-1">
+                                      <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-3">
+                                        <h3 className="font-bold text-white text-lg">{withdrawal.agent_name}</h3>
+                                        {getStatusBadge(withdrawal.status)}
+                                      </div>
+                                      <p className="text-slate-400 mb-4 text-sm md:text-base">{withdrawal.agent_email}</p>
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                      <Button
+                                        onClick={() => processAgentWithdrawal(withdrawal.id, "processing")}
+                                        variant="outline"
+                                        size="sm"
+                                        className="border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white"
+                                      >
+                                        <Settings className="h-4 w-4 mr-2" />
+                                        Processar
+                                      </Button>
+                                      <Button
+                                        onClick={() => processAgentWithdrawal(withdrawal.id, "completed")}
+                                        className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white"
+                                        size="sm"
+                                      >
+                                        <CheckCircle className="h-4 w-4 mr-2" />
+                                        Concluir
+                                      </Button>
+                                      <Button
+                                        onClick={() =>
+                                          processAgentWithdrawal(
+                                            withdrawal.id,
+                                            "cancelled",
+                                            "Cancelado pelo administrador",
+                                          )
+                                        }
+                                        className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
+                                        size="sm"
+                                      >
+                                        <XCircle className="h-4 w-4 mr-2" />
+                                        Cancelar
+                                      </Button>
+                                    </div>
+                                  </div>
+                                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-sm">
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Valor</p>
+                                      <p className="text-emerald-400 font-bold text-base md:text-lg">
+                                        {formatCurrency(withdrawal.amount)}
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Chave PIX</p>
+                                      <p className="font-mono text-white text-xs md:text-sm break-all">{withdrawal.pix_key}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Tipo</p>
+                                      <p className="uppercase text-white">{withdrawal.pix_type}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Solicitado em</p>
+                                      <p className="text-white text-xs md:text-sm">{formatDate(withdrawal.created_at)}</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-center py-12">
+                            <Clock className="h-16 w-16 md:h-20 md:w-20 text-slate-600 mx-auto mb-6" />
+                            <p className="text-slate-400 text-lg">Nenhuma solicitação de saque pendente</p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                </Tabs>
+              </div>
+            </TabsContent>
+
+            {/* Afiliados */}
+            <TabsContent value="affiliates" className="space-y-4 md:space-y-8">
+              <div className="space-y-4 md:space-y-8">
+                {/* Header da seção de afiliados */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-2xl md:text-3xl font-bold text-white flex items-center space-x-3">
+                      <div className="p-2 bg-emerald-500/20 rounded-xl">
+                        <UserCheck className="h-5 w-5 md:h-6 md:w-6 text-emerald-400" />
+                      </div>
+                      <span>Gerenciar Afiliados</span>
+                    </h2>
+                    <p className="text-slate-400 text-sm md:text-lg">Administre o programa de afiliados</p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={fetchAffiliatesData}
+                    disabled={affiliatesLoading}
+                    size="sm"
+                    className="border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white transition-all duration-300"
+                  >
+                    <RefreshCw className={`h-4 w-4 mr-2 ${affiliatesLoading ? "animate-spin" : ""}`} />
+                    <span className="hidden md:inline">Atualizar Afiliados</span>
+                    <span className="md:hidden">Atualizar</span>
+                  </Button>
+                </div>
+
+                {/* Campo de busca para afiliados */}
+                <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                  <CardContent className="p-4">
+                    <div className="flex items-center space-x-4">
+                      <div className="flex-1">
+                        <Input
+                          placeholder="Buscar afiliado por nome, email ou código..."
+                          value={affiliateSearchTerm}
+                          onChange={(e) => setAffiliateSearchTerm(e.target.value)}
+                          className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:ring-emerald-500/20"
+                        />
+                      </div>
+                      {affiliateSearchTerm && (
+                        <Button
+                          onClick={() => setAffiliateSearchTerm("")}
+                          variant="outline"
+                          size="sm"
+                          className="border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white"
+                        >
+                          <XCircle className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Stats Cards dos Afiliados */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                  <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                    <CardContent className="p-4 md:p-6">
+                      <div className="flex items-center space-x-3 md:space-x-4">
+                        <div className="p-2 md:p-3 bg-blue-500/20 rounded-xl">
+                          <Users className="h-6 w-6 md:h-8 md:w-8 text-blue-400" />
+                        </div>
+                        <div>
+                          <p className="text-xs md:text-sm font-medium text-slate-400">Total de Afiliados</p>
+                          <p className="text-2xl md:text-3xl font-bold text-white">{totalAffiliates}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                    <CardContent className="p-4 md:p-6">
+                      <div className="flex items-center space-x-3 md:space-x-4">
+                        <div className="p-2 md:p-3 bg-emerald-500/20 rounded-xl">
+                          <DollarSign className="h-6 w-6 md:h-8 md:w-8 text-emerald-400" />
+                        </div>
+                        <div>
+                          <p className="text-xs md:text-sm font-medium text-slate-400">Comissão Total</p>
+                          <p className="text-2xl md:text-3xl font-bold text-white">{formatCurrency(totalCommissionEarned)}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                    <CardContent className="p-4 md:p-6">
+                      <div className="flex items-center space-x-3 md:space-x-4">
+                        <div className="p-2 md:p-3 bg-emerald-500/20 rounded-xl">
+                          <CheckCircle className="h-6 w-6 md:h-8 md:w-8 text-emerald-400" />
+                        </div>
+                        <div>
+                          <p className="text-xs md:text-sm font-medium text-slate-400">Comissão Paga</p>
+                          <p className="text-2xl md:text-3xl font-bold text-emerald-400">{formatCurrency(totalCommissionPaid)}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                    <CardContent className="p-4 md:p-6">
+                      <div className="flex items-center space-x-3 md:space-x-4">
+                        <div className="p-2 md:p-3 bg-amber-500/20 rounded-xl">
+                          <Clock className="h-6 w-6 md:h-8 md:w-8 text-amber-400" />
+                        </div>
+                        <div>
+                          <p className="text-xs md:text-sm font-medium text-slate-400">Pendente</p>
+                          <p className="text-2xl md:text-3xl font-bold text-amber-400">{formatCurrency(pendingCommission)}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Tabs dos Afiliados */}
+                <Tabs defaultValue="affiliates-list" className="space-y-4 md:space-y-6">
+                  <TabsList className="bg-slate-800/50 border-slate-700 grid grid-cols-2 w-full">
+                    <TabsTrigger
+                      value="affiliates-list"
+                      className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400 text-xs md:text-sm"
+                    >
+                      <span className="md:hidden">Lista ({filteredAffiliates.length})</span>
+                      <span className="hidden md:inline">Afiliados ({filteredAffiliates.length})</span>
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="withdrawals-list"
+                      className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-slate-400 text-xs md:text-sm"
+                    >
+                      <span className="md:hidden">Saques ({withdrawals.length})</span>
+                      <span className="hidden md:inline">Saques Pendentes ({withdrawals.length})</span>
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="affiliates-list">
+                    <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+                      <CardHeader>
+                        <CardTitle className="text-white text-lg">Lista de Afiliados</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {affiliatesLoading ? (
+                          <div className="flex items-center justify-center py-12">
+                            <div className="text-center space-y-4">
+                              <RefreshCw className="h-12 w-12 animate-spin text-amber-500 mx-auto" />
+                              <span className="text-slate-400 text-lg">Carregando afiliados...</span>
+                            </div>
+                          </div>
+                        ) : filteredAffiliates.length > 0 ? (
+                          <div className="space-y-4 md:space-y-6">
+                            {filteredAffiliates.map((affiliate) => (
+                              <div
+                                key={affiliate.id}
+                                className="p-4 md:p-6 bg-slate-800/30 rounded-xl border border-slate-700/50"
+                              >
+                                <div className="flex flex-col gap-4">
+                                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                                    <div className="flex-1">
+                                      <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-3">
+                                        <h3 className="font-bold text-white text-lg">{affiliate.user_name}</h3>
+                                        {getStatusBadge(affiliate.status)}
+                                      </div>
+                                      <p className="text-slate-400 mb-4 text-sm md:text-base">{affiliate.user_email}</p>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                      <Button
+                                        onClick={() => {
+                                          setSelectedAffiliate(affiliate)
+                                          setNewCommissionRate(affiliate.commission_rate.toString())
+                                        }}
+                                        className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
+                                        size="sm"
+                                      >
+                                        <Settings className="h-4 w-4 mr-1" />
+                                        <span className="hidden md:inline">Editar Taxa</span>
+                                        <span className="md:hidden">Taxa</span>
+                                      </Button>
+                                      <Button
+                                        onClick={() => setSelectedAffiliateForPasswordChange(affiliate)}
+                                        className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+                                        size="sm"
+                                      >
+                                        <KeyRound className="h-4 w-4 mr-1" />
+                                        <span className="hidden md:inline">Alterar Senha</span>
+                                        <span className="md:hidden">Senha</span>
+                                      </Button>
+                                      <Button
+                                        onClick={() => toggleAffiliateStatus(affiliate.id, affiliate.status)}
+                                        disabled={actionLoading}
+                                        variant="outline"
+                                        size="sm"
+                                        className={`border-slate-700 ${
+                                          affiliate.status === "active"
+                                            ? "bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                                            : "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                                        }`}
+                                      >
+                                        {affiliate.status === "active" ? (
+                                          <>
+                                            <XCircle className="h-4 w-4 mr-1" />
+                                            <span className="hidden md:inline">Desativar</span>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <CheckCircle className="h-4 w-4 mr-1" />
+                                            <span className="hidden md:inline">Ativar</span>
+                                          </>
+                                        )}
+                                      </Button>
+                                      <Button
+                                        onClick={() =>
+                                          setDeleteConfirm({
+                                            type: "affiliate",
+                                            id: affiliate.id,
+                                            name: affiliate.user_name,
+                                          })
+                                        }
+                                        variant="outline"
+                                        size="sm"
+                                        className="border-red-500/50 bg-red-500/10 text-red-400 hover:bg-red-500/20"
+                                      >
+                                        <Trash2 className="h-4 w-4 mr-1" />
+                                        <span className="hidden md:inline">Excluir</span>
+                                      </Button>
+                                    </div>
+                                  </div>
+                                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6 text-sm">
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Código</p>
+                                      <p className="text-emerald-400 font-mono font-medium text-xs md:text-sm">
+                                        {affiliate.affiliate_code}
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Comissão</p>
+                                      <p className="font-medium text-white">{affiliate.commission_rate}%</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Indicações</p>
+                                      <p className="font-medium text-white">{affiliate.total_referrals}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Ganhou</p>
+                                      <p className="text-emerald-400 font-medium text-xs md:text-sm">
+                                        {formatCurrency(affiliate.total_commission_earned)}
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <p className="text-slate-400 mb-1">Saldo Disponível</p>
+                                      <p className="text-blue-400 font-medium text-xs md:text-sm">
+                                        {formatCurrency(
+                                          Number(affiliate.total_commission_earned || 0) -
+                                            Number(affiliate.total_commission_paid || 0),
+                                        )}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-center py-12">
+                            <Users className="h-16 w-16 md:h-20 md:w-20 text-slate-600 mx-auto mb-6" />
                             <p className="text-slate-400 text-lg mb-4">Nenhum afiliado cadastrado ainda</p>
                             <Button
                               onClick={fetchAffiliatesData}
@@ -3166,20 +3082,20 @@ export default function AdminConfigPage() {
                       </CardHeader>
                       <CardContent>
                         {withdrawals.length > 0 ? (
-                          <div className="space-y-6">
+                          <div className="space-y-4 md:space-y-6">
                             {withdrawals.map((withdrawal) => (
                               <div
                                 key={withdrawal.id}
-                                className="p-6 bg-slate-800/30 rounded-xl border border-slate-700/50"
+                                className="p-4 md:p-6 bg-slate-800/30 rounded-xl border border-slate-700/50"
                               >
                                 <div className="flex flex-col gap-4">
-                                  <div className="flex items-center justify-between">
+                                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                                     <div className="flex-1">
-                                      <div className="flex items-center gap-4 mb-3">
+                                      <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-3">
                                         <h3 className="font-bold text-white text-lg">{withdrawal.affiliate_name}</h3>
                                         {getStatusBadge(withdrawal.status)}
                                       </div>
-                                      <p className="text-slate-400 mb-4">{withdrawal.affiliate_email}</p>
+                                      <p className="text-slate-400 mb-4 text-sm md:text-base">{withdrawal.affiliate_email}</p>
                                     </div>
                                     <div className="flex flex-col gap-2">
                                       <Button
@@ -3215,16 +3131,16 @@ export default function AdminConfigPage() {
                                       </Button>
                                     </div>
                                   </div>
-                                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
+                                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-sm">
                                     <div>
                                       <p className="text-slate-400 mb-1">Valor</p>
-                                      <p className="text-emerald-400 font-bold text-lg">
+                                      <p className="text-emerald-400 font-bold text-base md:text-lg">
                                         {formatCurrency(withdrawal.amount)}
                                       </p>
                                     </div>
                                     <div>
                                       <p className="text-slate-400 mb-1">Chave PIX</p>
-                                      <p className="font-mono text-white text-sm break-all">{withdrawal.pix_key}</p>
+                                      <p className="font-mono text-white text-xs md:text-sm break-all">{withdrawal.pix_key}</p>
                                     </div>
                                     <div>
                                       <p className="text-slate-400 mb-1">Tipo</p>
@@ -3232,7 +3148,7 @@ export default function AdminConfigPage() {
                                     </div>
                                     <div>
                                       <p className="text-slate-400 mb-1">Solicitado em</p>
-                                      <p className="text-white text-sm">{formatDate(withdrawal.created_at)}</p>
+                                      <p className="text-white text-xs md:text-sm">{formatDate(withdrawal.created_at)}</p>
                                     </div>
                                   </div>
                                 </div>
@@ -3241,7 +3157,7 @@ export default function AdminConfigPage() {
                           </div>
                         ) : (
                           <div className="text-center py-12">
-                            <Clock className="h-20 w-20 text-slate-600 mx-auto mb-6" />
+                            <Clock className="h-16 w-16 md:h-20 md:w-20 text-slate-600 mx-auto mb-6" />
                             <p className="text-slate-400 text-lg">Nenhuma solicitação de saque pendente</p>
                           </div>
                         )}
@@ -3250,21 +3166,21 @@ export default function AdminConfigPage() {
                   </TabsContent>
                 </Tabs>
               </div>
-            )}
+            </TabsContent>
 
             {/* Configurações */}
-            {activeSection === "settings" && (
-              <div className="space-y-8">
+            <TabsContent value="settings" className="space-y-4 md:space-y-8">
+              <div className="space-y-4 md:space-y-8">
                 {/* Header da seção de configurações */}
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
-                    <h2 className="text-3xl font-bold text-white flex items-center space-x-3">
+                    <h2 className="text-2xl md:text-3xl font-bold text-white flex items-center space-x-3">
                       <div className="p-2 bg-blue-500/20 rounded-xl">
-                        <Settings className="h-6 w-6 text-blue-400" />
+                        <Settings className="h-5 w-5 md:h-6 md:w-6 text-blue-400" />
                       </div>
                       <span>Configurações do Sistema</span>
                     </h2>
-                    <p className="text-slate-400 text-lg">Configure limites de depósitos e saques</p>
+                    <p className="text-slate-400 text-sm md:text-lg">Configure limites de depósitos e saques</p>
                   </div>
                   <Button
                     variant="outline"
@@ -3274,7 +3190,7 @@ export default function AdminConfigPage() {
                     className="border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white transition-all duration-300"
                   >
                     <RefreshCw className={`h-4 w-4 mr-2 ${settingsLoading ? "animate-spin" : ""}`} />
-                    Atualizar
+                    <span className="hidden md:inline">Atualizar</span>
                   </Button>
                 </div>
 
@@ -3286,13 +3202,13 @@ export default function AdminConfigPage() {
                     </div>
                   </div>
                 ) : settings ? (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
                     {/* Configurações de Depósito */}
                     <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
                       <CardHeader>
                         <CardTitle className="text-white flex items-center space-x-3 text-lg">
                           <div className="p-2 bg-emerald-500/20 rounded-lg">
-                            <TrendingUp className="h-5 w-5 text-emerald-400" />
+                            <TrendingUp className="h-4 w-4 md:h-5 md:w-5 text-emerald-400" />
                           </div>
                           <span>Limites de Depósito</span>
                         </CardTitle>
@@ -3344,7 +3260,7 @@ export default function AdminConfigPage() {
                       <CardHeader>
                         <CardTitle className="text-white flex items-center space-x-3 text-lg">
                           <div className="p-2 bg-red-500/20 rounded-lg">
-                            <TrendingDown className="h-5 w-5 text-red-400" />
+                            <TrendingDown className="h-4 w-4 md:h-5 md:w-5 text-red-400" />
                           </div>
                           <span>Limites de Saque</span>
                         </CardTitle>
@@ -3398,8 +3314,8 @@ export default function AdminConfigPage() {
                     {/* Botão de Salvar */}
                     <div className="lg:col-span-2">
                       <Card className="border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-                        <CardContent className="p-6">
-                          <div className="flex items-center justify-between">
+                        <CardContent className="p-4 md:p-6">
+                          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <div>
                               <h3 className="text-white font-semibold text-lg mb-2">Salvar Configurações</h3>
                               <p className="text-slate-400 text-sm">
@@ -3415,7 +3331,7 @@ export default function AdminConfigPage() {
                                 !newMinWithdraw ||
                                 !newMaxWithdraw
                               }
-                              className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold px-8 py-3"
+                              className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold px-6 md:px-8 py-3"
                             >
                               {updateSettingsLoading ? (
                                 <>
@@ -3425,7 +3341,8 @@ export default function AdminConfigPage() {
                               ) : (
                                 <>
                                   <CheckCircle className="h-4 w-4 mr-2" />
-                                  Salvar Configurações
+                                  <span className="hidden md:inline">Salvar Configurações</span>
+                                  <span className="md:hidden">Salvar</span>
                                 </>
                               )}
                             </Button>
@@ -3458,96 +3375,94 @@ export default function AdminConfigPage() {
                   </div>
                 )}
               </div>
-            )}
+            </TabsContent>
 
             {/* Reset */}
-            {activeSection === "reset" && (
-              <div className="space-y-8">
-                <Card className="border-red-500/50 bg-red-500/5 backdrop-blur-sm">
-                  <CardHeader>
-                    <CardTitle className="text-red-400 flex items-center space-x-3 text-lg">
-                      <div className="p-2 bg-red-500/20 rounded-lg">
-                        <AlertTriangle className="h-5 w-5 text-red-400" />
-                      </div>
-                      <span>Reset do Sistema</span>
-                    </CardTitle>
-                    <CardDescription className="text-red-300 text-sm">
-                      ⚠️ ATENÇÃO: Esta ação irá resetar todos os dados do sistema, exceto usuários cadastrados. Serão
-                      removidos: transações, jogadas, prêmios, logs de webhook e saldos das carteiras.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-8">
-                    <Alert className="border-red-500/50 bg-red-500/10">
-                      <AlertTriangle className="h-4 w-4 text-red-400" />
-                      <AlertDescription className="text-red-400 text-sm">
-                        Esta ação é irreversível! Todos os dados financeiros e de jogos serão perdidos permanentemente. Os
-                        usuários serão mantidos, mas com saldo zerado.
-                      </AlertDescription>
-                    </Alert>
-
-                    <div className="space-y-6">
-                      <div className="space-y-3">
-                        <Label htmlFor="resetPassword" className="text-red-300 font-semibold text-lg">
-                          Senha de Reset (obrigatória)
-                        </Label>
-                        <Input
-                          id="resetPassword"
-                          type="password"
-                          value={resetPassword}
-                          onChange={(e) => setResetPassword(e.target.value)}
-                          placeholder="Digite a senha de reset"
-                          className="bg-slate-800/50 border-red-500/50 text-white placeholder:text-slate-500 focus:border-red-400 focus:ring-red-400/20 h-12"
-                        />
-                      </div>
-
-                      {resetError && (
-                        <Alert className="border-red-500/50 bg-red-500/10">
-                          <AlertTriangle className="h-4 w-4 text-red-400" />
-                          <AlertDescription className="text-red-400">{resetError}</AlertDescription>
-                        </Alert>
-                      )}
-
-                      <div className="bg-red-500/10 p-6 rounded-xl border border-red-500/30">
-                        <h4 className="font-semibold text-red-300 mb-4 text-lg">O que será resetado:</h4>
-                        <ul className="text-sm text-red-400 space-y-2 mb-6">
-                          <li>• Todas as transações (depósitos, saques, jogadas)</li>
-                          <li>• Histórico de jogos e prêmios</li>
-                          <li>• Logs de webhooks</li>
-                          <li>• Saldos das carteiras (zerados)</li>
-                          <li>• Estatísticas financeiras</li>
-                        </ul>
-
-                        <h4 className="font-semibold text-red-300 mb-4 text-lg">O que será mantido:</h4>
-                        <ul className="text-sm text-red-400 space-y-2">
-                          <li>• Contas de usuários</li>
-                          <li>• Senhas e dados de login</li>
-                          <li>• Configurações do sistema</li>
-                        </ul>
-                      </div>
-
-                      <Button
-                        onClick={handleReset}
-                        disabled={!resetPassword || isResetting}
-                        className="w-full h-14 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
-                      >
-                        {isResetting ? (
-                          <>
-                            <RefreshCw className="h-5 w-5 mr-3 animate-spin" />
-                            Resetando Sistema...
-                          </>
-                        ) : (
-                          <>
-                            <AlertTriangle className="h-5 w-5 mr-3" />
-                            RESETAR SISTEMA
-                          </>
-                        )}
-                      </Button>
+            <TabsContent value="reset" className="space-y-4 md:space-y-8">
+              <Card className="border-red-500/50 bg-red-500/5 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="text-red-400 flex items-center space-x-3 text-lg">
+                    <div className="p-2 bg-red-500/20 rounded-lg">
+                      <AlertTriangle className="h-4 w-4 md:h-5 md:w-5 text-red-400" />
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-          </>
+                    <span>Reset do Sistema</span>
+                  </CardTitle>
+                  <CardDescription className="text-red-300 text-sm">
+                    ⚠️ ATENÇÃO: Esta ação irá resetar todos os dados do sistema, exceto usuários cadastrados. Serão
+                    removidos: transações, jogadas, prêmios, logs de webhook e saldos das carteiras.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6 md:space-y-8">
+                  <Alert className="border-red-500/50 bg-red-500/10">
+                    <AlertTriangle className="h-4 w-4 text-red-400" />
+                    <AlertDescription className="text-red-400 text-sm">
+                      Esta ação é irreversível! Todos os dados financeiros e de jogos serão perdidos permanentemente. Os
+                      usuários serão mantidos, mas com saldo zerado.
+                    </AlertDescription>
+                  </Alert>
+
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <Label htmlFor="resetPassword" className="text-red-300 font-semibold text-base md:text-lg">
+                        Senha de Reset (obrigatória)
+                      </Label>
+                      <Input
+                        id="resetPassword"
+                        type="password"
+                        value={resetPassword}
+                        onChange={(e) => setResetPassword(e.target.value)}
+                        placeholder="Digite a senha de reset"
+                        className="bg-slate-800/50 border-red-500/50 text-white placeholder:text-slate-500 focus:border-red-400 focus:ring-red-400/20 h-12"
+                      />
+                    </div>
+
+                    {resetError && (
+                      <Alert className="border-red-500/50 bg-red-500/10">
+                        <AlertTriangle className="h-4 w-4 text-red-400" />
+                        <AlertDescription className="text-red-400">{resetError}</AlertDescription>
+                      </Alert>
+                    )}
+
+                    <div className="bg-red-500/10 p-4 md:p-6 rounded-xl border border-red-500/30">
+                      <h4 className="font-semibold text-red-300 mb-4 text-base md:text-lg">O que será resetado:</h4>
+                      <ul className="text-sm text-red-400 space-y-2 mb-6">
+                        <li>• Todas as transações (depósitos, saques, jogadas)</li>
+                        <li>• Histórico de jogos e prêmios</li>
+                        <li>• Logs de webhooks</li>
+                        <li>• Saldos das carteiras (zerados)</li>
+                        <li>• Estatísticas financeiras</li>
+                      </ul>
+
+                      <h4 className="font-semibold text-red-300 mb-4 text-base md:text-lg">O que será mantido:</h4>
+                      <ul className="text-sm text-red-400 space-y-2">
+                        <li>• Contas de usuários</li>
+                        <li>• Senhas e dados de login</li>
+                        <li>• Configurações do sistema</li>
+                      </ul>
+                    </div>
+
+                    <Button
+                      onClick={handleReset}
+                      disabled={!resetPassword || isResetting}
+                      className="w-full h-12 md:h-14 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold text-base md:text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
+                    >
+                      {isResetting ? (
+                        <>
+                          <RefreshCw className="h-5 w-5 mr-3 animate-spin" />
+                          Resetando Sistema...
+                        </>
+                      ) : (
+                        <>
+                          <AlertTriangle className="h-5 w-5 mr-3" />
+                          RESETAR SISTEMA
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         ) : (
           <div className="text-center py-20">
             <AlertTriangle className="h-16 w-16 text-red-400 mx-auto mb-6" />
@@ -3560,302 +3475,340 @@ export default function AdminConfigPage() {
             </Button>
           </div>
         )}
+
+        {/* Modais responsivos */}
+        {/* Modal para editar gerente */}
+        {selectedManager && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-md border-slate-800/50 bg-slate-900/90 backdrop-blur-xl">
+              <CardHeader>
+                <CardTitle className="text-white text-lg md:text-xl">Editar Gerente</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-3">
+                  <p className="text-white text-sm md:text-base">
+                    Gerente: <strong className="text-yellow-400">{selectedManager.user_name}</strong>
+                  </p>
+                  <p className="text-xs md:text-sm text-slate-400">
+                    Taxa atual: <span className="text-white font-medium">{selectedManager.commission_rate}%</span>
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <Label htmlFor="newManagerRate" className="text-slate-300">
+                    Nova Taxa (%)
+                  </Label>
+                  <Input
+                    id="newManagerRate"
+                    type="number"
+                    min="0"
+                    max="20"
+                    step="0.1"
+                    value={newManagerCommissionRate}
+                    onChange={(e) => setNewManagerCommissionRate(e.target.value)}
+                    placeholder="Ex: 7.5"
+                    className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-yellow-500 focus:ring-yellow-500/20 h-12"
+                  />
+                </div>
+
+                <div className="flex flex-col md:flex-row gap-4 pt-4">
+                  <Button
+                    onClick={updateManagerCommissionRate}
+                    disabled={updateLoading || !newManagerCommissionRate}
+                    className="flex-1 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white h-12"
+                  >
+                    {updateLoading ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        Salvando...
+                      </>
+                    ) : (
+                      "Salvar"
+                    )}
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setSelectedManager(null)
+                      setNewManagerCommissionRate("")
+                    }}
+                    variant="outline"
+                    className="flex-1 border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white h-12"
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Modal para editar agente */}
+        {selectedAgent && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-md border-slate-800/50 bg-slate-900/90 backdrop-blur-xl">
+              <CardHeader>
+                <CardTitle className="text-white text-lg md:text-xl">Editar Agente</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-3">
+                  <p className="text-white text-sm md:text-base">
+                    Agente: <strong className="text-purple-400">{selectedAgent.user_name}</strong>
+                  </p>
+                  <p className="text-xs md:text-sm text-slate-400">
+                    Taxa atual: <span className="text-white font-medium">{selectedAgent.commission_rate}%</span>
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <Label htmlFor="newAgentRate" className="text-slate-300">
+                    Nova Taxa (%)
+                  </Label>
+                  <Input
+                    id="newAgentRate"
+                    type="number"
+                    min="0"
+                    max="50"
+                    step="0.1"
+                    value={newAgentCommissionRate}
+                    onChange={(e) => setNewAgentCommissionRate(e.target.value)}
+                    placeholder="Ex: 15.0"
+                    className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-purple-500 focus:ring-purple-500/20 h-12"
+                  />
+                </div>
+
+                <div className="flex flex-col md:flex-row gap-4 pt-4">
+                  <Button
+                    onClick={updateAgentCommissionRate}
+                    disabled={updateLoading || !newAgentCommissionRate}
+                    className="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white h-12"
+                  >
+                    {updateLoading ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        Salvando...
+                      </>
+                    ) : (
+                      "Salvar"
+                    )}
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setSelectedAgent(null)
+                      setNewAgentCommissionRate("")
+                    }}
+                    variant="outline"
+                    className="flex-1 border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white h-12"
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Modal para editar afiliado */}
+        {selectedAffiliate && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-md border-slate-800/50 bg-slate-900/90 backdrop-blur-xl">
+              <CardHeader>
+                <CardTitle className="text-white text-lg md:text-xl">Editar Taxa de Comissão</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-3">
+                  <p className="text-white text-sm md:text-base">
+                    Afiliado: <strong className="text-emerald-400">{selectedAffiliate.user_name}</strong>
+                  </p>
+                  <p className="text-xs md:text-sm text-slate-400">
+                    Taxa atual: <span className="text-white font-medium">{selectedAffiliate.commission_rate}%</span>
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <Label htmlFor="newRate" className="text-slate-300">
+                    Nova Taxa (%)
+                  </Label>
+                  <Input
+                    id="newRate"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={newCommissionRate}
+                    onChange={(e) => setNewCommissionRate(e.target.value)}
+                    placeholder="Ex: 5.0"
+                    className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:ring-emerald-500/20 h-12"
+                  />
+                </div>
+
+                <div className="flex flex-col md:flex-row gap-4 pt-4">
+                  <Button
+                    onClick={updateCommissionRate}
+                    disabled={updateLoading || !newCommissionRate}
+                    className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white h-12"
+                  >
+                    {updateLoading ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        Salvando...
+                      </>
+                    ) : (
+                      "Salvar"
+                    )}
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setSelectedAffiliate(null)
+                      setNewCommissionRate("")
+                    }}
+                    variant="outline"
+                    className="flex-1 border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white h-12"
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Modal para alterar senha do afiliado */}
+        {selectedAffiliateForPasswordChange && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-md border-slate-800/50 bg-slate-900/90 backdrop-blur-xl">
+              <CardHeader>
+                <CardTitle className="text-white text-lg md:text-xl">Alterar Senha do Afiliado</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-3">
+                  <p className="text-white text-sm md:text-base">
+                    Afiliado: <strong className="text-blue-400">{selectedAffiliateForPasswordChange.user_name}</strong>
+                  </p>
+                  <p className="text-xs md:text-sm text-slate-400">{selectedAffiliateForPasswordChange.user_email}</p>
+                </div>
+
+                <div className="space-y-3">
+                  <Label htmlFor="newPassword" className="text-slate-300">
+                    Nova Senha
+                  </Label>
+                  <Input
+                    id="newPassword"
+                    type="password"
+                    value={newAffiliatePassword}
+                    onChange={(e) => setNewAffiliatePassword(e.target.value)}
+                    placeholder="Digite a nova senha"
+                    className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20 h-12"
+                  />
+                  <p className="text-xs text-slate-400">A senha deve ter pelo menos 6 caracteres</p>
+                </div>
+
+                {passwordChangeError && (
+                  <Alert className="border-red-500/50 bg-red-500/10">
+                    <AlertTriangle className="h-4 w-4 text-red-400" />
+                    <AlertDescription className="text-red-400 text-sm">{passwordChangeError}</AlertDescription>
+                  </Alert>
+                )}
+
+                <div className="flex flex-col md:flex-row gap-4 pt-4">
+                  <Button
+                    onClick={updateAffiliatePassword}
+                    disabled={isUpdatingAffiliatePassword || !newAffiliatePassword}
+                    className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white h-12"
+                  >
+                    {isUpdatingAffiliatePassword ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        Alterando...
+                      </>
+                    ) : (
+                      <>
+                        <KeyRound className="h-4 w-4 mr-2" />
+                        Alterar Senha
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setSelectedAffiliateForPasswordChange(null)
+                      setNewAffiliatePassword("")
+                      setPasswordChangeError("")
+                    }}
+                    variant="outline"
+                    className="flex-1 border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white h-12"
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Modal de confirmação de exclusão */}
+        {deleteConfirm && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-md border-red-500/50 bg-slate-900/90 backdrop-blur-xl">
+              <CardHeader>
+                <CardTitle className="text-red-400 text-lg md:text-xl flex items-center space-x-3">
+                  <AlertTriangle className="h-5 w-5" />
+                  <span>Confirmar Exclusão</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-3">
+                  <p className="text-white text-sm md:text-base">
+                    Tem certeza que deseja excluir{" "}
+                    {deleteConfirm.type === "manager"
+                      ? "o gerente"
+                      : deleteConfirm.type === "agent"
+                        ? "o agente"
+                        : "o afiliado"}{" "}
+                    <strong className="text-red-400">{deleteConfirm.name}</strong>?
+                  </p>
+                  <p className="text-xs md:text-sm text-slate-400">
+                    Esta ação não pode ser desfeita. Todos os dados relacionados serão removidos permanentemente.
+                  </p>
+                </div>
+
+                <div className="flex flex-col md:flex-row gap-4 pt-4">
+                  <Button
+                    onClick={() => {
+                      if (deleteConfirm.type === "manager") {
+                        deleteManager(deleteConfirm.id)
+                      } else if (deleteConfirm.type === "agent") {
+                        deleteAgent(deleteConfirm.id)
+                      } else {
+                        deleteAffiliate(deleteConfirm.id)
+                      }
+                    }}
+                    disabled={actionLoading}
+                    className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white h-12"
+                  >
+                    {actionLoading ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        Excluindo...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Confirmar Exclusão
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    onClick={() => setDeleteConfirm(null)}
+                    variant="outline"
+                    className="flex-1 border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white h-12"
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
-    </SidebarInset>
-  </div>
-
-  {/* Todos os modais permanecem iguais */}
-  {/* Modal para editar gerente */}
-  {selectedManager && (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-md border-slate-800/50 bg-slate-900/90 backdrop-blur-xl">
-        <CardHeader>
-          <CardTitle className="text-white text-xl">Editar Gerente</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-3">
-            <p className="text-white">
-              Gerente: <strong className="text-yellow-400">{selectedManager.user_name}</strong>
-            </p>
-            <p className="text-sm text-slate-400">
-              Taxa atual: <span className="text-white font-medium">{selectedManager.commission_rate}%</span>
-            </p>
-          </div>
-
-          <div className="space-y-3">
-            <Label htmlFor="newManagerRate" className="text-slate-300">
-              Nova Taxa (%)
-            </Label>
-            <Input
-              id="newManagerRate"
-              type="number"
-              min="0"
-              max="20"
-              step="0.1"
-              value={newManagerCommissionRate}
-              onChange={(e) => setNewManagerCommissionRate(e.target.value)}
-              placeholder="Ex: 7.5"
-              className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-yellow-500 focus:ring-yellow-500/20 h-12"
-            />
-          </div>
-
-          <div className="flex gap-4 pt-4">
-            <Button
-              onClick={updateManagerCommissionRate}
-              disabled={updateLoading || !newManagerCommissionRate}
-              className="flex-1 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white h-12"
-            >
-              {updateLoading ? (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Salvando...
-                </>
-              ) : (
-                "Salvar"
-              )}
-            </Button>
-            <Button
-              onClick={() => {
-                setSelectedManager(null)
-                setNewManagerCommissionRate("")
-              }}
-              variant="outline"
-              className="flex-1 border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white h-12"
-            >
-              Cancelar
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
-  )}
-
-  {/* Modal para editar agente */}
-  {selectedAgent && (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-md border-slate-800/50 bg-slate-900/90 backdrop-blur-xl">
-        <CardHeader>
-          <CardTitle className="text-white text-xl">Editar Agente</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-3">
-            <p className="text-white">
-              Agente: <strong className="text-purple-400">{selectedAgent.user_name}</strong>
-            </p>
-            <p className="text-sm text-slate-400">
-              Taxa atual: <span className="text-white font-medium">{selectedAgent.commission_rate}%</span>
-            </p>
-          </div>
-
-          <div className="space-y-3">
-            <Label htmlFor="newAgentRate" className="text-slate-300">
-              Nova Taxa (%)
-            </Label>
-            <Input
-              id="newAgentRate"
-              type="number"
-              min="0"
-              max="50"
-              step="0.1"
-              value={newAgentCommissionRate}
-              onChange={(e) => setNewAgentCommissionRate(e.target.value)}
-              placeholder="Ex: 15.0"
-              className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-purple-500 focus:ring-purple-500/20 h-12"
-            />
-          </div>
-
-          <div className="flex gap-4 pt-4">
-            <Button
-              onClick={updateAgentCommissionRate}
-              disabled={updateLoading || !newAgentCommissionRate}
-              className="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white h-12"
-            >
-              {updateLoading ? (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Salvando...
-                </>
-              ) : (
-                "Salvar"
-              )}
-            </Button>
-            <Button
-              onClick={() => {
-                setSelectedAgent(null)
-                setNewAgentCommissionRate("")
-              }}
-              variant="outline"
-              className="flex-1 border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white h-12"
-            >
-              Cancelar
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  )}
-
-  {/* Modal para editar afiliado */}
-  {selectedAffiliate && (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-md border-slate-800/50 bg-slate-900/90 backdrop-blur-xl">
-        <CardHeader>
-          <CardTitle className="text-white text-xl">Editar Taxa de Comissão</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-3">
-            <p className="text-white">
-              Afiliado: <strong className="text-emerald-400">{selectedAffiliate.user_name}</strong>
-            </p>
-            <p className="text-sm text-slate-400">
-              Taxa atual: <span className="text-white font-medium">{selectedAffiliate.commission_rate}%</span>
-            </p>
-          </div>
-
-          <div className="space-y-3">
-            <Label htmlFor="newRate" className="text-slate-300">
-              Nova Taxa (%)
-            </Label>
-            <Input
-              id="newRate"
-              type="number"
-              min="0"
-              max="100"
-              step="0.1"
-              value={newCommissionRate}
-              onChange={(e) => setNewCommissionRate(e.target.value)}
-              placeholder="Ex: 5.0"
-              className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:ring-emerald-500/20 h-12"
-            />
-          </div>
-
-          <div className="flex gap-4 pt-4">
-            <Button
-              onClick={updateCommissionRate}
-              disabled={updateLoading || !newCommissionRate}
-              className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white h-12"
-            >
-              {updateLoading ? (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Salvando...
-                </>
-              ) : (
-                "Salvar"
-              )}
-            </Button>
-            <Button
-              onClick={() => {
-                setSelectedAffiliate(null)
-                setNewCommissionRate("")
-              }}
-              variant="outline"
-              className="flex-1 border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white h-12"
-            >
-              Cancelar
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  )}
-
-  {/* Modal para alterar senha do afiliado */}
-  {selectedAffiliateForPasswordChange && (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-md border-slate-800/50 bg-slate-900/90 backdrop-blur-xl">
-        <CardHeader>
-          <CardTitle className="text-white text-xl">Alterar Senha do Afiliado</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-3">
-            <p className="text-white">
-              Afiliado: <strong className="text-blue-400">{selectedAffiliateForPasswordChange.user_name}</strong>
-            </p>
-            <p className="text-sm text-slate-400">{selectedAffiliateForPasswordChange.user_email}</p>
-          </div>
-
-          <div className="space-y-3">
-            <Label htmlFor="newPassword" className="text-slate-300">
-              Nova Senha
-            </Label>
-            <Input
-              id="newPassword"
-              type="password"
-              value={newAffiliatePassword}
-              onChange={(e) => setNewAffiliatePassword(e.target.value)}
-              placeholder="Digite a nova senha"
-              className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20 h-12"
-            />
-            <p className="text-xs text-slate-400">A senha deve ter pelo menos 6 caracteres</p>
-          </div>
-
-          {passwordChangeError && (
-            <Alert className="border-red-500/50 bg-red-500/10">
-              <AlertTriangle className="h-4 w-4 text-red-400" />
-              <AlertDescription className="text-red-400 text-sm">{passwordChangeError}</AlertDescription>
-            </Alert>
-          )}
-
-          <div className="flex gap-4 pt-4">
-            <Button
-              onClick={updateAffiliatePassword}
-              disabled={isUpdatingAffiliatePassword || !newAffiliatePassword}
-              className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white h-12"
-            >
-              {isUpdatingAffiliatePassword ? (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Alterando...
-                </>
-              ) : (
-                <>
-                  <KeyRound className="h-4 w-4 mr-2" />
-                  Alterar Senha
-                </>
-              )}
-            </Button>
-            <Button
-              onClick={() => {
-                setSelectedAffiliateForPasswordChange(null)
-                setNewAffiliatePassword("")
-                setPasswordChangeError("")
-              }}
-              variant="outline"
-              className="flex-1 border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white h-12"
-            >
-              Cancelar
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  )}
-
-  {/* Modal de confirmação de exclusão */}
-  {deleteConfirm && (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-md border-red-500/50 bg-slate-900/90 backdrop-blur-xl">
-        <CardHeader>
-          <CardTitle className="text-red-400 text-xl flex items-center space-x-3">
-            <AlertTriangle className="h-5 w-5" />
-            <span>Confirmar Exclusão</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-3">
-            <p className="text-white">
-              Tem certeza que deseja excluir{" "}
-              {deleteConfirm.type === "manager"
-                ? "o gerente"
-                : deleteConfirm.type === "agent"
-                  ? "o agente"
-                  : "o afiliado"}{" "}
-              <strong className="text-red-400">{deleteConfirm.name}</strong>?
-            </p>
-            <p className="text-sm text-slate-400">
-              Esta ação não pode ser desfeita. Todos os dados relacionados serão removidos permanentemente.
-            </p>
-          </div>
-
-          <div className="flex gap
+  )
+}
